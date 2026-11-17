@@ -152,6 +152,9 @@ g = gradle.read_text().replace('versionCode = 28', 'versionCode = 29').replace('
 gradle.write_text(g)
 
 v = verify.read_text().replace('versionCode = 28', 'versionCode = 29').replace('versionName = "0.7.4"', 'versionName = "0.7.5"')
-v = v.replace("printf 'Service lifecycle static checks: 7/7 passed.\\n'", "grep -F 'isRunning = true' \"$SERVICE\" >/dev/null\\ngrep -F 'isRunning = false' \"$SERVICE\" >/dev/null\\nprintf 'Service lifecycle static checks: 9/9 passed.\\n'")
+v = v.replace(
+    "printf 'Service lifecycle static checks: 7/7 passed.\\n'",
+    "grep -F 'isRunning = true' \"$SERVICE\" >/dev/null\ngrep -F 'isRunning = false' \"$SERVICE\" >/dev/null\nprintf 'Service lifecycle static checks: 9/9 passed.\\n'"
+)
 verify.write_text(v)
 print("EARTH UNLOCK v0.7.5 patch applied")
