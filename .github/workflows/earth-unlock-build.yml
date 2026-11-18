@@ -97,15 +97,15 @@ jobs:
         working-directory: source
         run: bash scripts/verify-service-lifecycle.sh
 
-      - name: Run unit tests and build debug APK
+      - name: Run unit tests and build signed release APK
         working-directory: source
         run: |
-          gradle --no-daemon :app:testDebugUnitTest :app:assembleDebug
+          gradle --no-daemon :app:testDebugUnitTest :app:assembleRelease
 
-      - name: Verify debug APK
+      - name: Verify signed release APK
         working-directory: source
         run: |
-          APK=app/build/outputs/apk/debug/app-debug.apk
+          APK=app/build/outputs/apk/release/app-release.apk
           test -s "$APK"
           ls -lh "$APK"
           APKSIGNER="$(find "$ANDROID_HOME/build-tools" -name apksigner -type f | sort -V | tail -n 1)"
@@ -113,10 +113,10 @@ jobs:
           "$APKSIGNER" verify --print-certs "$APK" | tee /tmp/apk-cert.txt
           grep -F 'B7:AB:83:77:A9:FE:D0:9F:6A:AF:F0:E5:FF:F1:01:68:67:53:D2:13:0F:91:E1:C7:91:9D:E2:E2:AC:8C:AB:8A' /tmp/apk-cert.txt
 
-      - name: Upload installable debug APK
+      - name: Upload installable signed APK
         uses: actions/upload-artifact@v4
         with:
-          name: EARTH-UNLOCK-debug-APK
-          path: source/app/build/outputs/apk/debug/app-debug.apk
+          name: EARTH-UNLOCK-signed-APK
+          path: source/app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
           retention-days: 30
