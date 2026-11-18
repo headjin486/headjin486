@@ -293,7 +293,7 @@ privacy.write_text(p, encoding="utf-8")
 # The foreground-service notification must use the same app-language preference.
 service = new_dir / "LocationTrackingService.kt"
 svc = service.read_text(encoding="utf-8")
-svc = svc.replace("import android.content.Intent\\n", "import android.content.Context\\nimport android.content.Intent\\n", 1)
+svc = svc.replace("import android.content.Intent\n", "import android.content.Context\nimport android.content.Intent\n", 1)
 service_attach = "    override fun onCreate() {"
 assert service_attach in svc
 svc = svc.replace(service_attach, """    override fun attachBaseContext(newBase: Context) {
