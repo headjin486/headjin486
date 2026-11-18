@@ -82,10 +82,10 @@ jobs:
               base64.b64decode(values["keystoreBase64"], validate=True)
           )
           (source / "keystore.properties").write_text(
-              "storeFile=upload-key.jks\\n"
-              + "storePassword=" + values["storePassword"] + "\\n"
-              + "keyAlias=" + values["keyAlias"] + "\\n"
-              + "keyPassword=" + values["keyPassword"] + "\\n",
+              "storeFile=upload-key.jks\n"
+              + "storePassword=" + values["storePassword"] + "\n"
+              + "keyAlias=" + values["keyAlias"] + "\n"
+              + "keyPassword=" + values["keyPassword"] + "\n",
               encoding="utf-8"
           )
           PY
@@ -111,7 +111,7 @@ jobs:
           APKSIGNER="$(find "$ANDROID_HOME/build-tools" -name apksigner -type f | sort -V | tail -n 1)"
           test -n "$APKSIGNER"
           "$APKSIGNER" verify --print-certs "$APK" | tee /tmp/apk-cert.txt
-          grep -F 'B7:AB:83:77:A9:FE:D0:9F:6A:AF:F0:E5:FF:F1:01:68:67:53:D2:13:0F:91:E1:C7:91:9D:E2:E2:AC:8C:AB:8A' /tmp/apk-cert.txt
+          grep -iF 'b7ab8377a9fed09f6aaff0e5fff101686753d2130f91e1c7919de2e2ac8cab8a' /tmp/apk-cert.txt
 
       - name: Upload installable signed APK
         uses: actions/upload-artifact@v4
