@@ -11,7 +11,7 @@ service cloud.firestore {
 
     // Public profile documents must contain public display data only.
     match /profiles/{uid} {
-      allow read: if true;
+      allow read: if owns(uid);
       allow create, update: if owns(uid)
         && request.resource.data.keys().hasOnly([
           'nickname', 'nicknameNormalized', 'createdAt', 'updatedAt',
