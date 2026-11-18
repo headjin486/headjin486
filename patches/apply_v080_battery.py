@@ -28,7 +28,7 @@ s = s.replace(
 '''    private val stopping = AtomicBoolean(false)
     // Keep 5-second high-accuracy fixes while moving. After three still samples,
     // reduce requests to 15 seconds; the first detected movement restores fast mode.
-    private var fastTracking = true
+    private var fastTracking = false
     private var stationarySamples = 0
     private var lastMotionSample: android.location.Location? = null
 ''', 1)
