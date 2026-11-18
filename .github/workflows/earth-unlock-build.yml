@@ -60,6 +60,39 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+      - name: Configure persistent APK signing
+        env:
+          ANDROID_SIGNING_BUNDLE: ${{ secrets.ANDROID_SIGNING_BUNDLE }}
+        run: |
+          test -n "$ANDROID_SIGNING_BUNDLE" || { echo "ANDROID_SIGNING_BUNDLE secret is missing"; exit 1; }
+          python - <<'PY'
+          import os, base64
+          from pathlib import Path
+          values = {}
+          for line in os.environ["ANDROID_SIGNING_BUNDLE"].splitlines():
+              if "=" in line:
+                  key, value = line.split("=", 1)
+                  values[key.strip()] = value.strip()
+          required = ["storePassword", "keyAlias", "keyPassword", "keystoreBase64"]
+          missing = [key for key in required if not values.get(key)]
+          if missing:
+              raise SystemExit("Signing bundle missing fields: " + ", ".join(missing))
+          source = Path("source")
+          (source / "upload-key.jks").write_bytes(
+              base64.b64decode(values["keystoreBase64"], validate=True)
+          )
+          (source / "keystore.properties").write_text(
+              "storeFile=upload-key.jks\\n"
+              + "storePassword=" + values["storePassword"] + "\\n"
+              + "keyAlias=" + values["keyAlias"] + "\\n"
+              + "keyPassword=" + values["keyPassword"] + "\\n",
+              encoding="utf-8"
+          )
+          PY
+
+      - name: Apply v0.7.8 persistent signing
+        run: python patches/apply_v078_signing.py source
+
       - name: Run static lifecycle checks
         working-directory: source
         run: bash scripts/verify-service-lifecycle.sh
@@ -75,6 +108,10 @@ jobs:
           APK=app/build/outputs/apk/debug/app-debug.apk
           test -s "$APK"
           ls -lh "$APK"
+          APKSIGNER="$(find "$ANDROID_HOME/build-tools" -name apksigner -type f | sort -V | tail -n 1)"
+          test -n "$APKSIGNER"
+          "$APKSIGNER" verify --print-certs "$APK" | tee /tmp/apk-cert.txt
+          grep -F 'B7:AB:83:77:A9:FE:D0:9F:6A:AF:F0:E5:FF:F1:01:68:67:53:D2:13:0F:91:E1:C7:91:9D:E2:E2:AC:8C:AB:8A' /tmp/apk-cert.txt
 
       - name: Upload installable debug APK
         uses: actions/upload-artifact@v4
