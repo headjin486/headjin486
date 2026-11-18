@@ -217,7 +217,6 @@ summary_count = s.count(old_summary)
 if summary_count != 1:
     raise SystemExit(f"Expected one exploration summary to localize, found {summary_count}")
 s = s.replace(old_summary, 'countText.text = getString(R.string.exploration_summary, percentLabel, areaLabel)')
-    raise SystemExit(f"Expected one exploration summary to localize, found {summary_count}")
 
 # Add a language control next to the location permission control.
 old = '''        val settings = Button(this).apply { text = getString(R.string.location_permission_settings); setOnClickListener { openAppSettings() } }
