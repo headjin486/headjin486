@@ -31,6 +31,7 @@ s = s.replace(
     private var fastTracking = false
     private var stationarySamples = 0
     private var lastMotionSample: android.location.Location? = null
+    private var requestGeneration = 0
 ''', 1)
 
 old = '''        val request = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 5000L)
@@ -105,6 +106,7 @@ replacement = '''        requestLocationMode(fast = true)
         if (stopping.get() || !::fused.isInitialized || !::callback.isInitialized) return
         if (fastTracking == fast) return
         fastTracking = fast
+        val generation = ++requestGeneration
         val interval = if (fast) 5_000L else 15_000L
         val minInterval = if (fast) 3_000L else 12_000L
         val minDistance = if (fast) 3f else 5f
@@ -113,13 +115,22 @@ replacement = '''        requestLocationMode(fast = true)
             .setMinUpdateDistanceMeters(minDistance)
             .build()
         try {
-            fused.removeLocationUpdates(callback)
-            fused.requestLocationUpdates(request, callback, mainLooper)
-                .addOnFailureListener {
-                    // Never silently continue if the location provider rejects a mode change.
+            fused.removeLocationUpdates(callback).addOnCompleteListener {
+                // Ignore stale mode changes if another movement transition happened
+                // while Play services was removing the previous request.
+                if (stopping.get() || generation != requestGeneration) return@addOnCompleteListener
+                try {
+                    fused.requestLocationUpdates(request, callback, mainLooper)
+                        .addOnFailureListener {
+                            // Never silently continue if the provider rejects a mode change.
+                            stopping.set(true)
+                            stopSelf()
+                        }
+                } catch (_: SecurityException) {
                     stopping.set(true)
                     stopSelf()
                 }
+            }
         } catch (_: SecurityException) {
             stopping.set(true)
             stopSelf()
