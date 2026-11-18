@@ -65,7 +65,7 @@ english = r'''<?xml version="1.0" encoding="utf-8"?>
     <string name="open_app_settings">Open app settings</string>
     <string name="close">Close</string>
     <string name="current_location_unavailable">Could not determine your current location. Start automatic exploration and try again.</string>
-    <string name="exploration_summary">🌍 Earth explored\n%s\nUnlocked area %s</string>
+    <string name="exploration_summary">🌍 Earth explored\n%1$s\nUnlocked area %2$s</string>
     <string name="map_load_failed">Could not load map data. Please try again shortly.</string>
     <string name="tracking_active">● Exploring · receiving and recording GPS location</string>
     <string name="tracking_inactive">● Exploration stopped</string>
@@ -105,11 +105,11 @@ korean = r'''<?xml version="1.0" encoding="utf-8"?>
     <string name="tracking_requested">● 탐험 시작 요청됨 · GPS 연결 확인 중</string>
     <string name="tracking_failed">탐험을 시작하지 못했습니다. 위치 권한과 기기 설정을 확인하세요.</string>
     <string name="permission_required_title">정확한 위치 권한이 필요합니다</string>
-    <string name="permission_required_body">약 10m 범위의 탐험 지도를 만들려면 정확한 위치 권한이 필요합니다. 설정에서 위치 권한을 '정확한 위치'로 허용한 뒤 다시 시작해 주세요.</string>
+    <string name="permission_required_body">약 10m 범위의 탐험 지도를 만들려면 정확한 위치 권한이 필요합니다. 설정에서 정확한 위치 권한을 허용한 뒤 다시 시작해 주세요.</string>
     <string name="open_app_settings">앱 설정 열기</string>
     <string name="close">닫기</string>
     <string name="current_location_unavailable">현재 위치를 확인하지 못했습니다. 자동 탐험을 시작해 주세요.</string>
-    <string name="exploration_summary">🌍 지구 탐험률\n%s\\n공개 면적 %s</string>
+    <string name="exploration_summary">🌍 지구 탐험률\n%1$s\\n공개 면적 %2$s</string>
     <string name="map_load_failed">지도 데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.</string>
     <string name="tracking_active">● 자동 탐험 중 · GPS 위치 수신/기록 중</string>
     <string name="tracking_inactive">● 탐험 중지됨</string>
@@ -130,6 +130,7 @@ korean = r'''<?xml version="1.0" encoding="utf-8"?>
     <string name="privacy_body">시행일: 2026-11-14\n운영자 및 개인정보 문의: [출시 전 개발자명과 연락 이메일 입력]\n\n1. 처리하는 정보\n사용자가 자동 탐험을 시작하고 안내에 동의한 동안 GPS 위치(위도·경도), 위치 정확도, 측정 시각을 처리합니다. 이를 이용해 현재 위치를 표시하고 탐험한 지도 격자를 계산합니다.\n\n2. 처리 목적\n현재 위치 표시, 이동 경로 및 누적 이동거리 계산, 방문한 지도 영역의 공개 상태와 탐험 통계 저장을 위해 사용합니다.\n\n3. 저장 위치 및 보유 기간\nGPS 기록과 탐험 격자는 기본적으로 Android 기기 내부의 앱 전용 SQLite 데이터베이스에 저장됩니다. 현재 버전은 계정 기반 서버 동기화 기능을 제공하지 않습니다. 앱 데이터 삭제 또는 앱 제거 시 로컬 기록이 삭제됩니다. 앱 자동 백업은 비활성화되어 있습니다.\n\n4. 외부 서비스\n현재 버전에는 광고·분석 SDK가 포함되어 있지 않습니다. 지도 표시를 위해 OpenStreetMap 기반 지도 타일을 네트워크로 요청합니다. 지도 타일 제공자는 요청 과정에서 IP 주소, 요청한 지도 영역, 접속 시각 등 네트워크 정보를 처리할 수 있습니다. 앱은 GPS 좌표를 별도로 지도 제공자에게 전송하지 않지만, 요청한 타일은 이용자가 보고 있는 지도 영역을 드러낼 수 있습니다. 실제 출시 전 지도 타일 제공자의 최신 약관과 개인정보 안내를 확인해야 합니다.\n\n5. 이용자의 선택과 통제\n정확한 위치 권한을 허용하지 않으면 자동 탐험 기능을 사용할 수 없습니다. 이용자는 앱의 탐험 중지 버튼 또는 지속 알림의 중지 동작으로 위치 기록을 중단할 수 있습니다. Android 설정에서 위치 권한을 철회하거나 앱 데이터를 삭제할 수 있습니다.\n\n6. 보안 및 문의\n기록은 앱 전용 내부 저장소에 보관하며 Android 자동 백업을 비활성화했습니다. 기기 자체의 보안 위험까지 완전히 방지할 수는 없습니다. 개인정보 관련 문의는 위 운영자 연락처로 접수할 수 있습니다.\n\n[출시 전 필수] 대괄호의 운영자·연락처를 실제 정보로 교체하고, 실제 배포 버전의 동작 및 지도 제공자와 대조한 뒤 공개 개인정보처리방침 URL을 게시해야 합니다. 이 화면은 초안이며 법률 검토를 대체하지 않습니다.</string>
 </resources>
 '''
+english = english.replace("'", "&apos;")
 (res / "values" / "strings.xml").write_text(english, encoding="utf-8")
 (res / "values-ko" / "strings.xml").write_text(korean, encoding="utf-8")
 
