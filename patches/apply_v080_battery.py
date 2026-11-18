@@ -10,8 +10,8 @@ policy = r'''package com.example.earthexplorer
 
 /** Conservative GPS duty-cycle policy: preserve high accuracy, reduce polling only while still. */
 internal object TrackingPowerPolicy {
-    const val MOVING_SPEED_METERS_PER_SECOND = 0.8f
-    const val MOVING_DISPLACEMENT_METERS = 6f
+    const val MOVING_SPEED_METERS_PER_SECOND = 0.5f
+    const val MOVING_DISPLACEMENT_METERS = 3f
     const val STILL_SAMPLES_BEFORE_SLOW_MODE = 3
 
     fun isMoving(speedMetersPerSecond: Float, displacementMeters: Float): Boolean =
@@ -194,7 +194,8 @@ class TrackingPowerPolicyTest {
 
     @Test fun treatsSmallStationaryDriftAsStill() {
         assertFalse(TrackingPowerPolicy.isMoving(0.2f, 2f))
-        assertFalse(TrackingPowerPolicy.isMoving(0f, 5.9f))
+        assertFalse(TrackingPowerPolicy.isMoving(0f, 2.9f))
+        assertTrue(TrackingPowerPolicy.isMoving(0.6f, 0.2f))
     }
 }
 ''', encoding="utf-8")
