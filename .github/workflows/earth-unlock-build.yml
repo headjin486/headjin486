@@ -102,6 +102,9 @@ jobs:
       - name: Apply v0.8.1 global package and localization
         run: python patches/apply_v081_global.py source
 
+      - name: Apply v0.8.2 first-launch-only language selection
+        run: python patches/apply_v082_first_launch_language.py source
+
       - name: Run static lifecycle checks
         working-directory: source
         run: bash scripts/verify-service-lifecycle.sh
