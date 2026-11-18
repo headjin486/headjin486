@@ -105,6 +105,9 @@ jobs:
       - name: Apply v0.8.2 first-launch-only language selection
         run: python patches/apply_v082_first_launch_language.py source
 
+      - name: Apply v0.8.3 global brand consistency
+        run: python patches/apply_v083_branding.py source
+
       - name: Run static lifecycle checks
         working-directory: source
         run: bash scripts/verify-service-lifecycle.sh
