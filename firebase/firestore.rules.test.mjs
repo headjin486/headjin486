@@ -8,7 +8,7 @@ import {
 } from "@firebase/rules-unit-testing";
 import {
   doc, getDoc, getDocs, collection, setDoc, deleteDoc,
-  writeBatch, serverTimestamp
+  writeBatch, serverTimestamp, Timestamp
 } from "firebase/firestore";
 
 const projectId = "demo-earth-unlock";
@@ -31,8 +31,8 @@ function profile(nickname = "ExplorerOne", normalized = "explorerone") {
   return {
     nickname,
     nicknameNormalized: normalized,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
+    createdAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
     recoveryProvider: "none"
   };
 }
@@ -43,7 +43,7 @@ async function createAccount(uid, nickname = "ExplorerOne", normalized = "explor
   batch.set(doc(db, "profiles", uid), profile(nickname, normalized));
   batch.set(doc(db, "nickname_claims", normalized), {
     uid,
-    createdAt: serverTimestamp()
+    createdAt: Timestamp.now()
   });
   await assertSucceeds(batch.commit());
   return db;
@@ -70,7 +70,7 @@ test("nickname claims allow exact checks but deny enumeration and duplicates", a
   batch.set(doc(bob, "profiles", "bob"), profile("ExplorerOne", "explorerone"));
   batch.set(doc(bob, "nickname_claims", "explorerone"), {
     uid: "bob",
-    createdAt: serverTimestamp()
+    createdAt: Timestamp.now()
   });
   await assertFails(batch.commit());
   await assertSucceeds(getDoc(doc(alice, "profiles", "alice")));
