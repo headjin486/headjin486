@@ -117,8 +117,10 @@ replacement = '''        requestLocationMode(fast = true)
         val generation = ++requestGeneration
         val interval = if (fast) 5_000L else 15_000L
         val minInterval = if (fast) 3_000L else 12_000L
-        // Fast mode must receive periodic still samples; slow mode filters GPS drift.
-        val minDistance = if (fast) 0f else 5f
+        // Both modes must receive timed samples: a 5 m distance filter in slow mode
+        // can suppress slow-walking fixes and prevent the service from detecting motion.
+        // The 15-second interval already reduces stationary GPS polling.
+        val minDistance = 0f
         val request = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, interval)
             .setMinUpdateIntervalMillis(minInterval)
             .setMinUpdateDistanceMeters(minDistance)
@@ -216,6 +218,7 @@ v += '''
 # Adaptive GPS policy must keep high accuracy and use slower polling only while still.
 grep -F 'Priority.PRIORITY_HIGH_ACCURACY' "$SERVICE" >/dev/null
 grep -F 'val interval = if (fast) 5_000L else 15_000L' "$SERVICE" >/dev/null
+grep -F 'val minDistance = 0f' "$SERVICE" >/dev/null
 grep -F 'updateAdaptiveTrackingMode(loc)' "$SERVICE" >/dev/null
 grep -F 'TrackingPowerPolicy.STILL_SAMPLES_BEFORE_SLOW_MODE' "$SERVICE" >/dev/null
 grep -F 'TrackingPowerPolicy.isMoving' "$SERVICE" >/dev/null
