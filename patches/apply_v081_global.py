@@ -212,8 +212,8 @@ for old, new in replacements.items():
         raise SystemExit(f"MainActivity localization target not found: {old[:100]}")
     s = s.replace(old, new, 1)
 
-summary_pattern = r'countText\\.text = "🌍 지구 탐험률(?:\\\\n|\\n)\\$percentLabel(?:\\\\n|\\n)공개 면적 \\$areaLabel"'
- s, summary_count = re.subn(summary_pattern, 'countText.text = getString(R.string.exploration_summary, percentLabel, areaLabel)', s)
+summary_pattern = r'countText\.text = "🌍 지구 탐험률(?:\\n|\n)\$percentLabel(?:\\n|\n)공개 면적 \$areaLabel"'
+s, summary_count = re.subn(summary_pattern, 'countText.text = getString(R.string.exploration_summary, percentLabel, areaLabel)', s)
 if summary_count != 1:
     raise SystemExit(f"Expected one exploration summary to localize, found {summary_count}")
 
