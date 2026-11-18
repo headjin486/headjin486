@@ -99,6 +99,9 @@ jobs:
       - name: Apply v0.8.0 adaptive GPS battery optimization
         run: python patches/apply_v080_battery.py source
 
+      - name: Apply v0.8.1 global package and localization
+        run: python patches/apply_v081_global.py source
+
       - name: Run static lifecycle checks
         working-directory: source
         run: bash scripts/verify-service-lifecycle.sh
