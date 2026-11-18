@@ -25,7 +25,7 @@ for base in [root / "app", root / "scripts"]:
             value = path.read_text(encoding="utf-8")
         except UnicodeDecodeError:
             continue
-        updated = value.replace(old_pkg, new_pkg)
+        updated = value.replace(old_pkg, new_pkg).replace("com/example/earthexplorer", "com/earthunlock/app")
         if updated != value:
             path.write_text(updated, encoding="utf-8")
 
