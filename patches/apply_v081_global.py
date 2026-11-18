@@ -109,7 +109,7 @@ korean = r'''<?xml version="1.0" encoding="utf-8"?>
     <string name="open_app_settings">앱 설정 열기</string>
     <string name="close">닫기</string>
     <string name="current_location_unavailable">현재 위치를 확인하지 못했습니다. 자동 탐험을 시작해 주세요.</string>
-    <string name="exploration_summary">🌍 지구 탐험률\n%1$s\\n공개 면적 %2$s</string>
+    <string name="exploration_summary">🌍 지구 탐험률\n%1$s\n공개 면적 %2$s</string>
     <string name="map_load_failed">지도 데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.</string>
     <string name="tracking_active">● 자동 탐험 중 · GPS 위치 수신/기록 중</string>
     <string name="tracking_inactive">● 탐험 중지됨</string>
