@@ -1,0 +1,70 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function owns(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    // Public profile documents must contain public display data only.
+    match /profiles/{uid} {
+      allow read: if true;
+      allow create, update: if owns(uid)
+        && request.resource.data.keys().hasOnly([
+          'nickname', 'nicknameNormalized', 'createdAt', 'updatedAt',
+          'recoveryProvider'
+        ])
+        && request.resource.data.nickname is string
+        && request.resource.data.nickname.size() >= 2
+        && request.resource.data.nickname.size() <= 12
+        && request.resource.data.nicknameNormalized is string
+        && request.resource.data.recoveryProvider in ['none', 'google'];
+      allow delete: if owns(uid);
+    }
+
+    // Direct get is allowed for uniqueness checks; collection listing is not.
+    match /nickname_claims/{nicknameNormalized} {
+      allow get: if signedIn();
+      allow list: if false;
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['uid', 'createdAt'])
+        && request.resource.data.uid == request.auth.uid;
+      allow update: if false;
+      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
+    }
+
+    // Spark-tier scores are client-submitted and therefore provisional.
+    // Do not describe these values as server-verified rankings.
+    match /leaderboard/{uid} {
+      allow read: if true;
+      allow create, update: if owns(uid)
+        && request.resource.data.keys().hasOnly([
+          'nickname', 'exploredAreaM2', 'exploredCellCount', 'updatedAt'
+        ])
+        && request.resource.data.nickname is string
+        && request.resource.data.exploredAreaM2 is number
+        && request.resource.data.exploredAreaM2 >= 0
+        && request.resource.data.exploredCellCount is int
+        && request.resource.data.exploredCellCount >= 0;
+      allow delete: if owns(uid);
+    }
+
+    // Private, per-account backup chunks. Payload format is versioned by client.
+    match /exploration_backups/{uid}/chunks/{chunkId} {
+      allow read, write: if owns(uid)
+        && (request.resource == null
+            || request.resource.data.keys().hasOnly([
+              'formatVersion', 'payload', 'updatedAt'
+            ]))
+        && (request.resource == null
+            || request.resource.data.formatVersion is int)
+        && (request.resource == null
+            || request.resource.data.payload is string)
+        && (request.resource == null
+            || request.resource.data.payload.size() <= 700000);
+    }
+  }
+}
