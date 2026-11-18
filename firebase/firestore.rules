@@ -13,18 +13,12 @@ service cloud.firestore {
         && data.recoveryProvider in ['none', 'google'];
     }
 
-    function claimMatches(uid, normalized) {
-      return getAfter(/databases/$(database)/documents/nickname_claims/$(normalized)).data.uid == uid;
-    }
-
     match /profiles/{uid} {
       allow get: if owns(uid);
       allow list: if false;
-      allow create: if owns(uid) && validProfile(request.resource.data)
-        && claimMatches(uid, request.resource.data.nicknameNormalized);
+      allow create: if owns(uid) && validProfile(request.resource.data);
       allow update: if owns(uid) && validProfile(request.resource.data)
-        && request.resource.data.createdAt == resource.data.createdAt
-        && claimMatches(uid, request.resource.data.nicknameNormalized);
+        && request.resource.data.createdAt == resource.data.createdAt;
       allow delete: if owns(uid);
     }
 
@@ -35,11 +29,9 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(['uid', 'createdAt'])
         && request.resource.data.keys().hasAll(['uid', 'createdAt'])
         && request.resource.data.uid == request.auth.uid
-        && request.resource.data.createdAt is timestamp
-        && getAfter(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.nicknameNormalized == nicknameNormalized;
+        && request.resource.data.createdAt is timestamp;
       allow update: if false;
-      allow delete: if signedIn() && resource.data.uid == request.auth.uid
-        && getAfter(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.nicknameNormalized != nicknameNormalized;
+      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
     }
 
     // Public read, owner-only writes. Spark client scores are provisional, not verified.
