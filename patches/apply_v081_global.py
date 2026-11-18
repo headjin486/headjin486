@@ -203,7 +203,7 @@ replacements = {
     '.setMessage("약 10m 범위의 탐험 지도를 만들려면 정확한 위치 권한이 필요합니다. 설정에서 위치 권한을 \'정확한 위치\'로 허용한 뒤 다시 시작해 주세요.")': '.setMessage(R.string.permission_required_body)',
     '.setPositiveButton("앱 설정 열기")': '.setPositiveButton(R.string.open_app_settings)',
     '.setNegativeButton("닫기", null)': '.setNegativeButton(R.string.close, null)',
-    'countText.text = "🌍 지구 탐험률\\n$percentLabel\\n공개 면적 $areaLabel"': 'countText.text = getString(R.string.exploration_summary, percentLabel, areaLabel)',
+    'countText.text = "🌍 지구 탐험률\n$percentLabel\n공개 면적 $areaLabel"': 'countText.text = getString(R.string.exploration_summary, percentLabel, areaLabel)',
     'countText.text = "지도 데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요."': 'countText.text = getString(R.string.map_load_failed)',
     'trackingStatusText.text = if (running) "● 자동 탐험 중 · GPS 위치 수신/기록 중" else "● 탐험 중지됨"': 'trackingStatusText.text = getString(if (running) R.string.tracking_active else R.string.tracking_inactive)',
     'android.widget.Toast.makeText(this, "현재 위치를 확인하지 못했습니다. 자동 탐험을 시작해 주세요.", android.widget.Toast.LENGTH_SHORT).show()': 'android.widget.Toast.makeText(this, R.string.current_location_unavailable, android.widget.Toast.LENGTH_SHORT).show()',
