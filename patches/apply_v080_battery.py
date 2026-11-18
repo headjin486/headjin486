@@ -51,13 +51,21 @@ new = '''        callback = object : LocationCallback() {
                 if (stopping.get()) return
                 result.locations.forEach { loc ->
                     if (stopping.get()) return@forEach
-                    // Evaluate motion before the accuracy gate: a coarse fix can still
-                    // tell us that movement resumed and should restore fast GPS mode.
-                    updateAdaptiveTrackingMode(loc)
                     // Ignore weak fixes; a 10 m reveal is not credible when GPS error is large.
 '''
 assert old in s
 s = s.replace(old, new, 1)
+
+# Only validated fixes are used for motion-state transitions.
+valid_fix = '''                            loc.latitude, loc.longitude, loc.accuracy, loc.time
+                        )) return@forEach
+                    // Keep ordering deterministic'''
+valid_fix_replacement = '''                            loc.latitude, loc.longitude, loc.accuracy, loc.time
+                        )) return@forEach
+                    updateAdaptiveTrackingMode(loc)
+                    // Keep ordering deterministic'''
+assert valid_fix in s
+s = s.replace(valid_fix, valid_fix_replacement, 1)
 
 needle = '''        try {
             fused.requestLocationUpdates(request, callback, mainLooper)
@@ -109,7 +117,8 @@ replacement = '''        requestLocationMode(fast = true)
         val generation = ++requestGeneration
         val interval = if (fast) 5_000L else 15_000L
         val minInterval = if (fast) 3_000L else 12_000L
-        val minDistance = if (fast) 3f else 5f
+        // Fast mode must receive periodic still samples; slow mode filters GPS drift.
+        val minDistance = if (fast) 0f else 5f
         val request = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, interval)
             .setMinUpdateIntervalMillis(minInterval)
             .setMinUpdateDistanceMeters(minDistance)
