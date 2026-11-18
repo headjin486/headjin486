@@ -12,12 +12,12 @@
 3. `google-services.json`을 내려받는다. 이 파일을 공개 저장소에 올리지 않는다.
 4. Authentication에서 익명 로그인을 활성화한다.
 5. Firestore Database를 생성하고, 지역은 실제 주요 이용자와 데이터 거주 요구를 고려해 선택한다.
-6. 이 저장소의 `firebase/firestore.rules`를 검토한 뒤 Firebase Console Rules에 적용한다.
+6. 이 저장소의 `firebase/firestore.rules`를 Firebase Emulator Suite로 테스트한 뒤 Firebase Console Rules에 적용한다.
 7. 앱 등록 및 Firestore 설정이 끝나면 Android 구성 파일을 안전하게 빌드 환경에 전달해야 한다.
 
 ## 구현·검증 순서
 1. 익명 인증으로 UID 발급 및 재실행 시 세션 유지 확인
-2. 닉네임 예약 트랜잭션과 중복 닉네임 동시 등록 테스트
+2. 닉네임 예약 트랜잭션과 중복 닉네임 동시 등록 테스트 (프로필·예약 문서의 원자적 갱신)
 3. 기기 내 SQLite explored_cells와 클라우드 백업 청크의 버전/압축 포맷 확정
 4. 업로드·복구는 셀 집합 병합(INSERT OR IGNORE)으로 구현하고, 네트워크 실패 시 로컬 탐험을 중단하지 않도록 처리
 5. TOP 30 조회와 내 순위 표시 연결
