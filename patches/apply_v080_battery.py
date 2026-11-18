@@ -149,8 +149,8 @@ activity = base / "MainActivity.kt"
 a = activity.read_text(encoding="utf-8")
 assert "private val refreshGeneration = AtomicInteger(0)" in a
 a = a.replace(
-    "    private val refreshGeneration = AtomicInteger(0)\\n",
-    "    private val refreshGeneration = AtomicInteger(0)\\n    private var lastLiveFogRefreshAt = 0L\\n",
+    "    private val refreshGeneration = AtomicInteger(0)\n",
+    "    private val refreshGeneration = AtomicInteger(0)\n    private var lastLiveFogRefreshAt = 0L\n",
     1
 )
 old_receiver = """        override fun onReceive(context: Context?, intent: Intent?) {
