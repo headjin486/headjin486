@@ -143,6 +143,32 @@ assert needle in s
 s = s.replace(needle, replacement, 1)
 service.write_text(s, encoding="utf-8")
 
+# The visible Activity only needs to redraw fog periodically; the GPS service
+# still persists every accepted fix and updates the live marker on each fix.
+activity = base / "MainActivity.kt"
+a = activity.read_text(encoding="utf-8")
+assert "private val refreshGeneration = AtomicInteger(0)" in a
+a = a.replace(
+    "    private val refreshGeneration = AtomicInteger(0)\\n",
+    "    private val refreshGeneration = AtomicInteger(0)\\n    private var lastLiveFogRefreshAt = 0L\\n",
+    1
+)
+old_receiver = """        override fun onReceive(context: Context?, intent: Intent?) {
+            refreshFog()
+            val lat = intent?.getDoubleExtra(LocationTrackingService.EXTRA_LAT, Double.NaN) ?: Double.NaN
+"""
+new_receiver = """        override fun onReceive(context: Context?, intent: Intent?) {
+            val now = android.os.SystemClock.elapsedRealtime()
+            if (now - lastLiveFogRefreshAt >= 10_000L) {
+                lastLiveFogRefreshAt = now
+                refreshFog()
+            }
+            val lat = intent?.getDoubleExtra(LocationTrackingService.EXTRA_LAT, Double.NaN) ?: Double.NaN
+"""
+assert old_receiver in a
+a = a.replace(old_receiver, new_receiver, 1)
+activity.write_text(a, encoding="utf-8")
+
 test_dir = root / "app/src/test/java/com/example/earthexplorer"
 test_dir.mkdir(parents=True, exist_ok=True)
 (test_dir / "TrackingPowerPolicyTest.kt").write_text('''package com.example.earthexplorer
@@ -182,6 +208,7 @@ grep -F 'val interval = if (fast) 5_000L else 15_000L' "$SERVICE" >/dev/null
 grep -F 'updateAdaptiveTrackingMode(loc)' "$SERVICE" >/dev/null
 grep -F 'TrackingPowerPolicy.STILL_SAMPLES_BEFORE_SLOW_MODE' "$SERVICE" >/dev/null
 grep -F 'TrackingPowerPolicy.isMoving' "$SERVICE" >/dev/null
+grep -F 'lastLiveFogRefreshAt >= 10_000L' app/src/main/java/com/example/earthexplorer/MainActivity.kt >/dev/null
 '''
 verify.write_text(v, encoding="utf-8")
 print("EARTH UNLOCK v0.8.0 adaptive GPS battery policy patch applied")
