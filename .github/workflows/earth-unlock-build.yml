@@ -33,6 +33,9 @@ jobs:
       - name: Apply v0.7.6 exploration and map improvements
         run: python patches/apply_v076.py source
 
+      - name: Apply v0.7.7 resume location refresh
+        run: python patches/apply_v077.py source
+
       - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
