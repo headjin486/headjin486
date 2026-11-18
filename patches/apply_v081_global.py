@@ -212,9 +212,11 @@ for old, new in replacements.items():
         raise SystemExit(f"MainActivity localization target not found: {old[:100]}")
     s = s.replace(old, new, 1)
 
-summary_pattern = r'countText\.text = "🌍 지구 탐험률(?:\\n|\n)\$percentLabel(?:\\n|\n)공개 면적 \$areaLabel"'
-s, summary_count = re.subn(summary_pattern, 'countText.text = getString(R.string.exploration_summary, percentLabel, areaLabel)', s)
+old_summary = 'countText.text = "🌍 지구 탐험률\\n$percentLabel\\n공개 면적 $areaLabel"'
+summary_count = s.count(old_summary)
 if summary_count != 1:
+    raise SystemExit(f"Expected one exploration summary to localize, found {summary_count}")
+s = s.replace(old_summary, 'countText.text = getString(R.string.exploration_summary, percentLabel, areaLabel)')
     raise SystemExit(f"Expected one exploration summary to localize, found {summary_count}")
 
 # Add a language control next to the location permission control.
