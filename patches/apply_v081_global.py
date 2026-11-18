@@ -69,6 +69,10 @@ english = r'''<?xml version="1.0" encoding="utf-8"?>
     <string name="map_load_failed">Could not load map data. Please try again shortly.</string>
     <string name="tracking_active">● Exploring · receiving and recording GPS location</string>
     <string name="tracking_inactive">● Exploration stopped</string>
+    <string name="tracking_channel_name">EARTH UNLOCK location tracking</string>
+    <string name="tracking_notification_title">EARTH UNLOCK is exploring</string>
+    <string name="tracking_notification_text">Automatically revealing the area around your route.</string>
+    <string name="tracking_notification_stop">Stop exploring</string>
     <string name="language_dialog_title">Choose app language</string>
     <string name="language_system">Follow device language</string>
     <string name="language_korean">한국어</string>
@@ -113,6 +117,10 @@ korean = r'''<?xml version="1.0" encoding="utf-8"?>
     <string name="map_load_failed">지도 데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.</string>
     <string name="tracking_active">● 자동 탐험 중 · GPS 위치 수신/기록 중</string>
     <string name="tracking_inactive">● 탐험 중지됨</string>
+    <string name="tracking_channel_name">지구 탐험 위치 기록</string>
+    <string name="tracking_notification_title">지구 탐험 기록 중</string>
+    <string name="tracking_notification_text">이동 경로 주변을 자동으로 탐험하고 있습니다.</string>
+    <string name="tracking_notification_stop">탐험 중지</string>
     <string name="language_dialog_title">앱 언어 선택</string>
     <string name="language_system">기기 언어 따라가기</string>
     <string name="language_korean">한국어</string>
@@ -282,6 +290,29 @@ p = p.replace('text = POLICY_TEXT', 'text = getString(R.string.privacy_body)')
 p = p.replace('text = "닫기"', 'text = getString(R.string.close)')
 privacy.write_text(p, encoding="utf-8")
 
+# The foreground-service notification must use the same app-language preference.
+service = new_dir / "LocationTrackingService.kt"
+svc = service.read_text(encoding="utf-8")
+svc = svc.replace("import android.content.Intent\\n", "import android.content.Context\\nimport android.content.Intent\\n", 1)
+service_attach = "    override fun onCreate() {"
+assert service_attach in svc
+svc = svc.replace(service_attach, """    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(AppLocale.wrap(newBase))
+    }
+
+"""+service_attach, 1)
+for old, new in {
+    '"지구 탐험 위치 기록"':'getString(R.string.tracking_channel_name)',
+    'setContentTitle("지구 탐험 기록 중")':'setContentTitle(getString(R.string.tracking_notification_title))',
+    'setContentText("이동 경로 주변을 자동으로 탐험하고 있습니다.")':'setContentText(getString(R.string.tracking_notification_text))',
+    'Notification.Action.Builder(null, "탐험 중지", stop)':'Notification.Action.Builder(null, getString(R.string.tracking_notification_stop), stop)',
+}.items():
+    if old not in svc:
+        raise SystemExit(f"Service localization target not found: {old}")
+    svc = svc.replace(old, new, 1)
+service.write_text(svc, encoding="utf-8")
+
+
 # Expose supported languages to Android 13+ system app-language settings.
 xml_dir = res / "xml"
 xml_dir.mkdir(parents=True, exist_ok=True)
@@ -308,6 +339,8 @@ grep -F 'name="language_dialog_title"' app/src/main/res/values/strings.xml >/dev
 grep -F 'name="language_dialog_title"' app/src/main/res/values-ko/strings.xml >/dev/null
 grep -F 'AppLocale.wrap(newBase)' app/src/main/java/com/earthunlock/app/MainActivity.kt >/dev/null
 grep -F 'putString("app_language", values[which])' app/src/main/java/com/earthunlock/app/MainActivity.kt >/dev/null
+grep -F 'AppLocale.wrap(newBase)' app/src/main/java/com/earthunlock/app/LocationTrackingService.kt >/dev/null
+grep -F 'tracking_notification_title' app/src/main/res/values/strings.xml >/dev/null
 '''
 verify.write_text(v, encoding="utf-8")
 
