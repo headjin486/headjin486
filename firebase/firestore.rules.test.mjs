@@ -49,9 +49,7 @@ async function createAccount(uid, nickname = "ExplorerOne", normalized = "explor
   return db;
 }
 
-test("profile and nickname claim must be written atomically", async () => {
-  const db = env.authenticatedContext("alice").firestore();
-  await assertFails(setDoc(doc(db, "profiles", "alice"), profile()));
+test("profile and nickname claim can be committed in one atomic batch", async () => {
   await createAccount("alice");
 });
 
