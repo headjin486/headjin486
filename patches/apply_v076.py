@@ -86,3 +86,4 @@ method='''    private fun goToCurrentLocation() {
 assert needle in s; s=s.replace(needle,method+needle,1)
 s=s.replace('EarthExplorer/0.7.4','EarthExplorer/0.7.6'); p.write_text(s)
 p=r/'app/build.gradle.kts'; s=p.read_text().replace('versionCode = 29','versionCode = 30').replace('versionName = "0.7.5"','versionName = "0.7.6"'); p.write_text(s)
+p=r/'scripts/verify-service-lifecycle.sh'; s=p.read_text().replace('versionCode = 29','versionCode = 30').replace('versionName = "0.7.5"','versionName = "0.7.6"'); p.write_text(s)
