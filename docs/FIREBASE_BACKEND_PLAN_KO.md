@@ -85,3 +85,9 @@
 4. Spark 단계 Firestore 트랜잭션 기반 닉네임 중복 방지와 잠정 랭킹 읽기/쓰기 기능을 추가한다.
 5. 셀 백업/복구를 추가하고, 공식 서버 검증 랭킹이 필요해지는 시점에 Blaze 전환 여부를 별도 승인받는다.
 6. 개인정보/계정 삭제 및 Play 내부 테스트를 완료한다.
+
+## Firebase 연결 전 패키지 ID 확정 게이트
+- 현재 Android `namespace`와 `applicationId`는 모두 `com.example.earthexplorer`다.
+- Google Play에 첫 등록하기 전에 실제 서비스 소유자가 장기간 사용할 고유 패키지 ID로 변경해야 한다. Play 게시 후 패키지 ID는 변경할 수 없으며, 변경은 별도 앱으로 취급된다.
+- Firebase Android 앱 등록과 `google-services.json` 발급은 최종 패키지 ID가 확정된 뒤 진행한다. 임시 ID로 Firebase를 먼저 연결하지 않는다.
+- 후보 예시: `com.headjin486.earthunlock`. 이는 제안일 뿐이며, 사용자 확정 전에는 소스의 패키지 ID를 변경하지 않는다.
