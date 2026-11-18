@@ -103,7 +103,7 @@ replacement = '''        requestLocationMode(fast = true)
 
     private fun requestLocationMode(fast: Boolean) {
         if (stopping.get() || !::fused.isInitialized || !::callback.isInitialized) return
-        if (fastTracking == fast && fast) return
+        if (fastTracking == fast) return
         fastTracking = fast
         val interval = if (fast) 5_000L else 15_000L
         val minInterval = if (fast) 3_000L else 12_000L
