@@ -56,7 +56,7 @@
 
 ## 보안 규칙 초안
 - 모든 데이터 접근은 Firebase Authentication UID 기준으로 제한한다.
-- profiles는 랭킹 표시를 위해 읽기 허용하되 쓰기는 Cloud Functions로 제한한다.
+- profiles는 본인만 읽고 쓸 수 있도록 제한한다. 공개 닉네임은 leaderboard 문서에 별도 복제하며, 프로필의 복구 관련 정보는 공개하지 않는다.
 - leaderboard는 읽기만 허용하고 클라이언트 쓰기는 전면 금지한다.
 - nickname_claims는 클라이언트 읽기/쓰기 모두 금지한다.
 - exploration_backups는 인증된 본인 UID 경로만 읽기/쓰기 허용한다.
@@ -87,7 +87,6 @@
 6. 개인정보/계정 삭제 및 Play 내부 테스트를 완료한다.
 
 ## Firebase 연결 전 패키지 ID 확정 게이트
-- 현재 Android `namespace`와 `applicationId`는 모두 `com.example.earthexplorer`다.
-- Google Play에 첫 등록하기 전에 실제 서비스 소유자가 장기간 사용할 고유 패키지 ID로 변경해야 한다. Play 게시 후 패키지 ID는 변경할 수 없으며, 변경은 별도 앱으로 취급된다.
-- Firebase Android 앱 등록과 `google-services.json` 발급은 최종 패키지 ID가 확정된 뒤 진행한다. 임시 ID로 Firebase를 먼저 연결하지 않는다.
-- 후보 예시: `com.headjin486.earthunlock`. 이는 제안일 뿐이며, 사용자 확정 전에는 소스의 패키지 ID를 변경하지 않는다.
+- v0.8.1에서 Android `namespace`와 `applicationId`를 `com.earthunlock.app`으로 변경했고, 이후 Play 업데이트용 고정 ID로 사용한다.
+- 이전 `com.example.earthexplorer` 앱과는 별도 앱으로 취급되며 로컬 데이터는 자동 이전되지 않는다.
+- Firebase Android 앱 등록 시 패키지 이름 `com.earthunlock.app`을 정확히 사용한다.
