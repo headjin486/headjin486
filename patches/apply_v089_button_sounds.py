@@ -9,8 +9,13 @@ s=activity.read_text(encoding="utf-8")
 field_anchor="class MainActivity : AppCompatActivity() {"
 if field_anchor not in s: raise SystemExit("MainActivity class declaration missing")
 s=s.replace(field_anchor,field_anchor+"""
-    private val uiTone by lazy {
-        android.media.ToneGenerator(android.media.AudioManager.STREAM_SYSTEM, 28)
+    private var uiTone: android.media.ToneGenerator? = null
+
+    private fun playUiTone(tone: Int, durationMs: Int) {
+        val generator = uiTone ?: android.media.ToneGenerator(
+            android.media.AudioManager.STREAM_SYSTEM, 28
+        ).also { uiTone = it }
+        generator.startTone(tone, durationMs)
     }
 """,1)
 
@@ -18,9 +23,8 @@ s=s.replace(field_anchor,field_anchor+"""
 on_destroy_anchor="    override fun onCreate(savedInstanceState: Bundle?) {"
 if on_destroy_anchor not in s: raise SystemExit("onCreate lifecycle anchor missing")
 s=s.replace(on_destroy_anchor,"""    override fun onDestroy() {
-        if (this::class.java.isInstance(this)) {
-            try { uiTone.release() } catch (_: Exception) { }
-        }
+        uiTone?.release()
+        uiTone = null
         super.onDestroy()
     }
 
@@ -31,7 +35,7 @@ locate_anchor='''            setOnClickListener { goToCurrentLocation() }
 '''
 if locate_anchor not in s: raise SystemExit("Location click listener missing")
 s=s.replace(locate_anchor,'''            setOnClickListener {
-                uiTone.startTone(android.media.ToneGenerator.TONE_PROP_BEEP, 55)
+                playUiTone(android.media.ToneGenerator.TONE_PROP_BEEP, 55)
                 goToCurrentLocation()
             }
 ''',1)
@@ -42,7 +46,7 @@ compass_anchor='''            setOnClickListener {
 '''
 if compass_anchor not in s: raise SystemExit("Compass click listener missing")
 s=s.replace(compass_anchor,'''            setOnClickListener {
-                uiTone.startTone(android.media.ToneGenerator.TONE_PROP_ACK, 90)
+                playUiTone(android.media.ToneGenerator.TONE_PROP_ACK, 90)
                 map.setMapOrientation(0f)
 ''',1)
 
