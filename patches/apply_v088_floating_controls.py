@@ -88,6 +88,9 @@ g=g.replace('versionCode = 41','versionCode = 42',1).replace('versionName = "0.8
 gradle.write_text(g,encoding="utf-8")
 verify=root/"scripts/verify-service-lifecycle.sh"
 v=verify.read_text(encoding="utf-8").replace('versionCode = 41','versionCode = 42').replace('versionName = "0.8.7"','versionName = "0.8.8"')
+# v0.8.8 replaces the old styled floating button with a custom circular icon control.
+v = v.replace("grep -F 'styleActionButton(this, primary = false, floating = true)' app/src/main/java/com/earthunlock/app/MainActivity.kt >/dev/null", "grep -F 'minWidth = dp(46)' app/src/main/java/com/earthunlock/app/MainActivity.kt >/dev/null")
+
 v += """
 # Compact floating location and compass controls.
 grep -F 'contentDescription = getString(R.string.current_location_button)' app/src/main/java/com/earthunlock/app/MainActivity.kt >/dev/null
