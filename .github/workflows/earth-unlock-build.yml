@@ -114,6 +114,9 @@ jobs:
       - name: Apply v0.8.5 location marker and follow camera
         run: python patches/apply_v085_location_follow.py source
 
+      - name: Apply v0.8.6 two-finger map rotation and compass reset
+        run: python patches/apply_v086_map_rotation.py source
+
       - name: Run static lifecycle checks
         working-directory: source
         run: bash scripts/verify-service-lifecycle.sh
