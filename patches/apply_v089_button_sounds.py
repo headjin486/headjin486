@@ -59,5 +59,6 @@ g=g.replace('versionCode = 42','versionCode = 43',1).replace('versionName = "0.8
 gradle.write_text(g,encoding="utf-8")
 verify=root/"scripts/verify-service-lifecycle.sh"
 v=verify.read_text(encoding="utf-8").replace('versionCode = 42','versionCode = 43').replace('versionName = "0.8.8"','versionName = "0.8.9"')
+v=v.replace("grep -F 'refreshLatestSavedPosition()' app/src/main/java/com/example/earthexplorer/MainActivity.kt | grep -F 'onResume' >/dev/null || true", "sed -n '/override fun onResume()/,/^    }/p' app/src/main/java/com/example/earthexplorer/MainActivity.kt | grep -F 'refreshLatestSavedPosition()' >/dev/null")
 verify.write_text(v,encoding="utf-8")
 print("EARTH UNLOCK v0.8.9 concise location and compass feedback sounds patch applied")
