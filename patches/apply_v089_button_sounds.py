@@ -63,7 +63,7 @@ v += """
 # Distinct short UI feedback sounds for the map controls.
 grep -F 'ToneGenerator.TONE_PROP_BEEP, 55' app/src/main/java/com/earthunlock/app/MainActivity.kt >/dev/null
 grep -F 'ToneGenerator.TONE_PROP_ACK, 90' app/src/main/java/com/earthunlock/app/MainActivity.kt >/dev/null
-grep -F 'uiTone.release()' app/src/main/java/com/earthunlock/app/MainActivity.kt >/dev/null
+grep -F 'uiTone?.release()' app/src/main/java/com/earthunlock/app/MainActivity.kt >/dev/null
 """
 verify.write_text(v,encoding="utf-8")
 print("EARTH UNLOCK v0.8.9 concise location and compass feedback sounds patch applied")
