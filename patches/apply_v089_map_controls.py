@@ -289,6 +289,8 @@ verify = root / "scripts/verify-service-lifecycle.sh"
 v = verify.read_text(encoding="utf-8")
 v = v.replace('versionCode = 42', 'versionCode = 43').replace('versionName = "0.8.8"', 'versionName = "0.8.9"')
 # Update earlier-version assertions for the controls intentionally redesigned here.
+v = v.replace("grep -F 'minWidth = dp(46)' app/src/main/java/com/earthunlock/app/MainActivity.kt >/dev/null",
+              "grep -F 'LocationControlView(this)' app/src/main/java/com/earthunlock/app/MainActivity.kt >/dev/null")
 v = v.replace("grep -F 'contentDescription = getString(R.string.current_location_button)' app/src/main/java/com/earthunlock/app/MainActivity.kt >/dev/null",
               "grep -F 'contentDescription = context.getString(R.string.current_location_button)' app/src/main/java/com/earthunlock/app/MainActivity.kt >/dev/null")
 v = v.replace("grep -F 'text = \"⌖\"' app/src/main/java/com/earthunlock/app/MainActivity.kt >/dev/null",
