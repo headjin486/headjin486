@@ -17,16 +17,17 @@ s = s.replace(needle, needle + """    // Follow GPS automatically until the user
     private val mapTouchSlop by lazy { android.view.ViewConfiguration.get(this).scaledTouchSlop }
 """, 1)
 
-# Replace the default marker pin with a restrained blue location dot.
-needle = '        currentMarker = Marker(map).apply { title = "현재 위치"; setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM) }\n'
-replacement = '''        currentMarker = Marker(map).apply {
-            title = getString(R.string.current_location_button)
-            icon = createCurrentLocationIcon()
-            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
-        }
-'''
-if needle not in s: raise SystemExit("Current marker initialization not found")
+# Apply a custom icon after marker creation (independent of localized title text).
+needle = '        map.overlays.add(fog); map.overlays.add(currentMarker)\\n'
+replacement = needle + '        currentMarker.icon = createCurrentLocationIcon()\\n        currentMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)\\n'
+if needle not in s: raise SystemExit("Marker overlay insertion point not found")
 s = s.replace(needle, replacement, 1)
+
+# Keep the global percentage readable while retaining exact area below it.
+old_percent = 'String.format(Locale.US, "%.10f%%", explorationPercent)'
+new_percent = 'String.format(Locale.US, "%.8f%%", explorationPercent)'
+if old_percent not in s: raise SystemExit("Exploration percentage formatter not found")
+s = s.replace(old_percent, new_percent, 1)
 
 # Detect actual user gestures without consuming touch events, so osmdroid keeps handling the map.
 needle = '        mapFrame.addView(map)\n'
