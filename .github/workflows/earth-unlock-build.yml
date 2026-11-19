@@ -123,6 +123,9 @@ jobs:
       - name: Apply v0.8.8 minimalist floating controls
         run: python patches/apply_v088_floating_controls.py source
 
+      - name: Apply v0.8.9 animated map controls and edge-safe fog
+        run: python patches/apply_v089_map_controls.py source
+
       - name: Run static lifecycle checks
         working-directory: source
         run: bash scripts/verify-service-lifecycle.sh
