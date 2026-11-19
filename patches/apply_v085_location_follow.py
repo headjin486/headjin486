@@ -17,11 +17,15 @@ s = s.replace(needle, needle + """    // Follow GPS automatically until the user
     private val mapTouchSlop by lazy { android.view.ViewConfiguration.get(this).scaledTouchSlop }
 """, 1)
 
-# Apply a custom icon after marker creation (independent of localized title text).
-needle = '        map.overlays.add(fog); map.overlays.add(currentMarker)\\n'
-replacement = needle + '        currentMarker.icon = createCurrentLocationIcon()\\n        currentMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)\\n'
-if needle not in s: raise SystemExit("Marker overlay insertion point not found")
-s = s.replace(needle, replacement, 1)
+# Apply a custom icon after marker creation, tolerating formatting differences.
+lines = s.splitlines(keepends=True)
+overlay_index = next((i for i, line in enumerate(lines)
+                      if "map.overlays.add(fog)" in line and "map.overlays.add(currentMarker)" in line), None)
+if overlay_index is None:
+    raise SystemExit("Marker overlay insertion point not found")
+lines.insert(overlay_index + 1, '        currentMarker.icon = createCurrentLocationIcon()\\n')
+lines.insert(overlay_index + 2, '        currentMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)\\n')
+s = "".join(lines)
 
 # Keep the global percentage readable while retaining exact area below it.
 old_percent = 'String.format(Locale.US, "%.10f%%", explorationPercent)'
