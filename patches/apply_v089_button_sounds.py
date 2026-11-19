@@ -6,7 +6,7 @@ activity=root/"app/src/main/java/com/earthunlock/app/MainActivity.kt"
 s=activity.read_text(encoding="utf-8")
 
 # A single lightweight system tone generator; no audio assets or background service.
-field_anchor="class MainActivity : AppCompatActivity() {"
+field_anchor="class MainActivity : Activity() {"
 if field_anchor not in s: raise SystemExit("MainActivity class declaration missing")
 s=s.replace(field_anchor,field_anchor+"""
     private var uiTone: android.media.ToneGenerator? = null
