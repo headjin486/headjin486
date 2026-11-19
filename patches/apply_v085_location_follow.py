@@ -23,8 +23,8 @@ overlay_index = next((i for i, line in enumerate(lines)
                       if "map.overlays.add(fog)" in line and "map.overlays.add(currentMarker)" in line), None)
 if overlay_index is None:
     raise SystemExit("Marker overlay insertion point not found")
-lines.insert(overlay_index + 1, '        currentMarker.icon = createCurrentLocationIcon()\\n')
-lines.insert(overlay_index + 2, '        currentMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)\\n')
+lines.insert(overlay_index + 1, '        currentMarker.icon = createCurrentLocationIcon()\n')
+lines.insert(overlay_index + 2, '        currentMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)\n')
 s = "".join(lines)
 
 # Keep the global percentage readable while retaining exact area below it.
