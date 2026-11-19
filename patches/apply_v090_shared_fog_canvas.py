@@ -74,7 +74,7 @@ method = """    override fun draw(canvas: Canvas, mapView: MapView, shadow: Bool
 """
 f = f[:start] + method + f[end:]
 # The v0.8.9 renderer cached a separately rotated bitmap; this renderer has no such cache.
-f = "\\n".join(line for line in f.splitlines() if "cachedRotation" not in line) + "\\n"
+f = "\n".join(line for line in f.splitlines() if "cachedRotation" not in line) + "\n"
 fog.write_text(f, encoding="utf-8")
 
 # Advance version without changing application ID or signing configuration.
