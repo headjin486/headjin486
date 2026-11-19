@@ -19,16 +19,13 @@ s=s.replace(field_anchor,field_anchor+"""
     }
 """,1)
 
-# Release the audio resource with the Activity lifecycle.
-on_destroy_anchor="    override fun onCreate(savedInstanceState: Bundle?) {"
-if on_destroy_anchor not in s: raise SystemExit("onCreate lifecycle anchor missing")
-s=s.replace(on_destroy_anchor,"""    override fun onDestroy() {
+# Attach cleanup to the Activity's existing lifecycle method; do not declare a duplicate.
+on_destroy_anchor="    override fun onDestroy() {"
+if on_destroy_anchor not in s: raise SystemExit("Existing onDestroy lifecycle method missing")
+s=s.replace(on_destroy_anchor,on_destroy_anchor+"""
         uiTone?.release()
         uiTone = null
-        super.onDestroy()
-    }
-
-"""+on_destroy_anchor,1)
+""",1)
 
 # Add a short, restrained location confirmation sound on tap.
 locate_anchor='''            setOnClickListener { goToCurrentLocation() }
