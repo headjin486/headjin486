@@ -126,6 +126,9 @@ jobs:
       - name: Apply v0.8.9 animated map controls and edge-safe fog
         run: python patches/apply_v089_map_controls.py source
 
+      - name: Apply v0.9.0 shared-canvas fog and original text location button
+        run: python patches/apply_v090_shared_fog_canvas.py source
+
       - name: Run static lifecycle checks
         working-directory: source
         run: bash scripts/verify-service-lifecycle.sh
