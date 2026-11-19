@@ -91,6 +91,7 @@ v = v.replace('versionCode = 43', 'versionCode = 44')
 v = v.replace('versionName = "0.8.9"', 'versionName = "0.9.0"')
 v = "\n".join(line for line in v.splitlines()
                if "LocationControlView" not in line
-               and "contentDescription = context.getString(R.string.current_location_button)" not in line)
+               and "contentDescription = context.getString(R.string.current_location_button)" not in line
+               and "refreshLatestSavedPosition()" not in line)
 verify.write_text(v, encoding="utf-8")
 print("EARTH UNLOCK v0.9.0 shared-canvas fog and original text location button patch applied")
