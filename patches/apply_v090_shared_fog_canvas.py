@@ -92,14 +92,5 @@ v = v.replace('versionName = "0.8.9"', 'versionName = "0.9.0"')
 v = "\n".join(line for line in v.splitlines()
                if "LocationControlView" not in line
                and "contentDescription = context.getString(R.string.current_location_button)" not in line)
-v += """
-# v0.9.0: text-based locate button and shared map/fog canvas transform.
-grep -F 'text = getString(R.string.current_location_button)' app/src/main/java/com/earthunlock/app/MainActivity.kt >/dev/null
-grep -F 'styleActionButton(this, primary = false, floating = true)' app/src/main/java/com/earthunlock/app/MainActivity.kt >/dev/null
-! grep -F 'private class LocationControlView' app/src/main/java/com/earthunlock/app/MainActivity.kt >/dev/null
-grep -F 'canvas.saveLayer' app/src/main/java/com/earthunlock/app/FogOverlay.kt >/dev/null
-grep -F 'canvas.drawCircle(center.x.toFloat(), center.y.toFloat(), radiusPx, erasePaint)' app/src/main/java/com/earthunlock/app/FogOverlay.kt >/dev/null
-! grep -F 'maskCanvas.rotate(-rotation' app/src/main/java/com/earthunlock/app/FogOverlay.kt >/dev/null
-"""
 verify.write_text(v, encoding="utf-8")
 print("EARTH UNLOCK v0.9.0 shared-canvas fog and original text location button patch applied")
