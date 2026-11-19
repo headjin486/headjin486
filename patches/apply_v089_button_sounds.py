@@ -58,7 +58,7 @@ if 'versionCode = 42' not in g or 'versionName = "0.8.8"' not in g:
 g=g.replace('versionCode = 42','versionCode = 43',1).replace('versionName = "0.8.8"','versionName = "0.8.9"',1)
 gradle.write_text(g,encoding="utf-8")
 verify=root/"scripts/verify-service-lifecycle.sh"
-v=verify.read_text(encoding="utf-8").replace('versionCode = 42','versionCode = 43').replace('versionName = "0.8.8"','versionName = "0.8.9"')
+v=verify.read_text(encoding="utf-8").replace('versionCode = 31','versionCode = 43').replace('versionName = "0.7.7"','versionName = "0.8.9"')
 v=v.replace("grep -F 'refreshLatestSavedPosition()' app/src/main/java/com/example/earthexplorer/MainActivity.kt | grep -F 'onResume' >/dev/null || true", "sed -n '/override fun onResume()/,/^    }/p' app/src/main/java/com/example/earthexplorer/MainActivity.kt | grep -F 'refreshLatestSavedPosition()' >/dev/null")
 v=v.replace("app/src/main/java/com/example/earthexplorer/LocationTrackingService.kt", "app/src/main/java/com/earthunlock/app/LocationTrackingService.kt")
 v=v.replace("app/src/main/java/com/example/earthexplorer/MainActivity.kt", "app/src/main/java/com/earthunlock/app/MainActivity.kt")
