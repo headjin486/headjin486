@@ -73,8 +73,6 @@ method = """    override fun draw(canvas: Canvas, mapView: MapView, shadow: Bool
     }
 """
 f = f[:start] + method + f[end:]
-# Retire the mask cache so future code cannot accidentally reuse rotated screen-space data.
-f = re.sub(r"\n\s*private var cachedRotation: Float = Float\.NaN\n", "\n", f)
 fog.write_text(f, encoding="utf-8")
 
 # Advance version without changing application ID or signing configuration.
