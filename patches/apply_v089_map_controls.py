@@ -294,6 +294,7 @@ v = v.replace("grep -F 'text = \"⌖\"' app/src/main/java/com/earthunlock/app/Ma
 v = v.replace("grep -F 'Gravity.TOP or Gravity.START' app/src/main/java/com/earthunlock/app/MainActivity.kt >/dev/null",
               "grep -F 'topMargin = dp(74)' app/src/main/java/com/earthunlock/app/MainActivity.kt >/dev/null")
 v += """
+set -x
 # v0.8.9 animated map controls and edge-safe fog compositing.
 grep -F 'LocationControlView(this)' app/src/main/java/com/earthunlock/app/MainActivity.kt >/dev/null
 grep -F 'animateMapNorth' app/src/main/java/com/earthunlock/app/MainActivity.kt >/dev/null
