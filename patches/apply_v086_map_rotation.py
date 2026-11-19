@@ -29,27 +29,64 @@ if locate_anchor not in s:
     raise SystemExit("Locate button layout anchor not found")
 compass = '''        val compassReset = Button(this).apply {
             text = "N ↑"
-            textSize = 12f
+            textSize = 11f
             isAllCaps = false
+            minWidth = 0
+            minimumWidth = 0
+            setPadding(10, 4, 10, 4)
             setTextColor(Color.rgb(10, 31, 58))
             contentDescription = "지도 방향을 북쪽으로 초기화"
             background = android.graphics.drawable.GradientDrawable().apply {
                 setColor(Color.WHITE)
-                cornerRadius = 24f
+                cornerRadius = 22f
                 setStroke(1, Color.LTGRAY)
             }
-            elevation = 7f
+            elevation = 5f
+            visibility = android.view.View.GONE
             setOnClickListener {
                 map.setMapOrientation(0f)
                 map.invalidate()
+                visibility = android.view.View.GONE
             }
         }
         mapFrame.addView(compassReset, FrameLayout.LayoutParams(-2, -2, Gravity.TOP or Gravity.END).apply {
-            topMargin = 82
+            topMargin = 76
             marginEnd = 16
         })
+        // Keep the map uncluttered: show the small north-reset control only after rotation.
+        map.setOnTouchListener { _, event ->
+            when (event.actionMasked) {
+                android.view.MotionEvent.ACTION_DOWN -> {
+                    touchStartX = event.x
+                    touchStartY = event.y
+                    mapGestureMoved = false
+                }
+                android.view.MotionEvent.ACTION_POINTER_DOWN -> {
+                    mapGestureMoved = true
+                }
+                android.view.MotionEvent.ACTION_MOVE -> {
+                    if (!mapGestureMoved) {
+                        val dx = kotlin.math.abs(event.x - touchStartX)
+                        val dy = kotlin.math.abs(event.y - touchStartY)
+                        if (dx > mapTouchSlop || dy > mapTouchSlop) {
+                            mapGestureMoved = true
+                            followUserLocation = false
+                        }
+                    }
+                    compassReset.visibility =
+                        if (kotlin.math.abs(map.mapOrientation) > 2f) android.view.View.VISIBLE else android.view.View.GONE
+                }
+                android.view.MotionEvent.ACTION_UP,
+                android.view.MotionEvent.ACTION_CANCEL -> {
+                    compassReset.visibility =
+                        if (kotlin.math.abs(map.mapOrientation) > 2f) android.view.View.VISIBLE else android.view.View.GONE
+                }
+            }
+            false
+        }
 '''
 s = s.replace(locate_anchor, locate_anchor + compass, 1)
+
 
 # Multi-touch gestures (including rotation) must not disable GPS-follow mode.
 old = '''                android.view.MotionEvent.ACTION_POINTER_DOWN -> {
