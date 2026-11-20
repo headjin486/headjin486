@@ -6,11 +6,6 @@ pkg = root / "app/src/main/java/com/earthunlock/app"
 activity = pkg / "MainActivity.kt"
 a = activity.read_text(encoding="utf-8")
 
-old_count = "        panel.addView(countText)\\n"
-if a.count(old_count) != 1:
-    raise SystemExit("Exploration summary anchor missing or ambiguous")
-a = a.replace(old_count, "", 1)
-
 old_badge_block = """        val badgesButton = Button(this).apply {
             text = "🏅  나의 배지"
             setOnClickListener { showBadges() }
@@ -31,6 +26,7 @@ new_badge_block = """        val badgeList = BadgeManager.badges(this, store)
             styleActionButton(this, primary = false, compact = true)
             contentDescription = "나의 배지 컬렉션, " + badgeUnlockedCount + "개 획득"
         }
+        if (countText.parent === panel) panel.removeView(countText)
         val summaryRow = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
