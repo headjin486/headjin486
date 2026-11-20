@@ -1,5 +1,6 @@
 from pathlib import Path
 import sys
+import re
 
 root = Path(sys.argv[1])
 activity = root / "app/src/main/java/com/earthunlock/app/MainActivity.kt"
@@ -14,12 +15,12 @@ s = s.replace(old, """        val footerRow = LinearLayout(this).apply {
             gravity = Gravity.CENTER
         }""", 1)
 
-old = "        row2.addView(settings, LinearLayout.LayoutParams(-1, -2, 1f))"
-if old not in s:
-    raise SystemExit("Existing settings button anchor missing")
-s = s.replace(old, """        footerRow.addView(settings, LinearLayout.LayoutParams(0, dp(34), 1f).apply {
+pattern = r"(?m)^\s*row2\.addView\(settings, LinearLayout\.LayoutParams\([^\n]+\)\)\s*$"
+s, count = re.subn(pattern, """        footerRow.addView(settings, LinearLayout.LayoutParams(0, dp(34), 1f).apply {
             marginEnd = dp(5)
-        })""", 1)
+        })""", s, count=1)
+if count != 1:
+    raise SystemExit("Existing settings button row not found exactly once")
 
 old = """        panel.addView(badgesButton, LinearLayout.LayoutParams(-1, dp(40)).apply { topMargin = dp(2) })
         panel.addView(row2, LinearLayout.LayoutParams(-1, dp(44)).apply { topMargin = dp(8) })
