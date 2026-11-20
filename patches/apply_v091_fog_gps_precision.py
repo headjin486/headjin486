@@ -48,8 +48,8 @@ math_file.write_text(m, encoding="utf-8")
 service = pkg / "LocationTrackingService.kt"
 s = service.read_text(encoding="utf-8")
 for old_value, new_value in [
-    ("val interval = if (fast) 5_000L else 15_000L", "val interval = if (fast) 3_000L else 15_000L"),
-    ("val minInterval = if (fast) 3_000L else 12_000L", "val minInterval = if (fast) 1_500L else 12_000L"),
+    ("val interval = if (fast) 5_000L else 15_000L", "val interval = if (fast) 3_000L else 7_000L"),
+    ("val minInterval = if (fast) 3_000L else 12_000L", "val minInterval = if (fast) 1_500L else 6_000L"),
     ("store.recordAndReveal(point, 10.0)", "store.recordAndReveal(point, 8.0)"),
 ]:
     if old_value not in s:
