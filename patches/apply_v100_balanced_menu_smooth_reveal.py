@@ -48,10 +48,12 @@ activity.write_text(a, encoding="utf-8")
 
 fog = pkg / "FogOverlay.kt"
 f = fog.read_text(encoding="utf-8")
-needle = "        xfermode = android.graphics.PorterDuffXfermode(android.graphics.PorterDuff.Mode.DST_OUT)\\n"
-if f.count(needle) != 1:
-    raise SystemExit("Reveal erase-paint (DST_OUT) anchor missing or ambiguous")
-f = f.replace(needle, needle + "        maskFilter = android.graphics.BlurMaskFilter(3.5f, android.graphics.BlurMaskFilter.Blur.NORMAL)\\n", 1)
+import re
+matches = list(re.finditer(r"(?m)^\\s*xfermode\\s*=.*PorterDuff\\.Mode\\.(?:DST_OUT|CLEAR).*$", f))
+if len(matches) != 1:
+    raise SystemExit("Expected one reveal erase xfermode line, found " + str(len(matches)))
+pos = matches[0].end()
+f = f[:pos] + "\\n        maskFilter = android.graphics.BlurMaskFilter(3.5f, android.graphics.BlurMaskFilter.Blur.NORMAL)" + f[pos:]
 fog.write_text(f, encoding="utf-8")
 
 gradle = root / "app/build.gradle.kts"
