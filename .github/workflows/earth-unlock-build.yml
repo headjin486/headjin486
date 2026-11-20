@@ -12,6 +12,7 @@ on:
 permissions:
   contents: read
 
+# v0.10.0: compact summary/badge row and softly feathered reveal edges
 jobs:
   build:
     runs-on: ubuntu-latest
