@@ -135,6 +135,9 @@ jobs:
       - name: Apply v0.9.2 12m reveal, screen awake, and travel heading
         run: python patches/apply_v092_direction_screen_awake.py source
 
+      - name: Apply v0.9.3 continuous travel-heading follow
+        run: python patches/apply_v093_continuous_heading.py source
+
       - name: Run static lifecycle checks
         working-directory: source
         run: |
