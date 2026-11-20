@@ -15,6 +15,7 @@ permissions:
 # v0.10.0: compact summary/badge row and softly feathered reveal edges
 # v0.10.0: robust DST_OUT edge feathering patch
 # v0.10.0: two-pass antialiased edge feathering without blur filters
+# v0.10.1: MY EARTH personal-footprint brand identity
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -158,6 +159,9 @@ jobs:
 
       - name: Apply v0.10.0 balanced menu and smooth reveal edges
         run: python patches/apply_v100_balanced_menu_smooth_reveal.py source
+
+      - name: Apply v0.10.1 MY EARTH brand identity
+        run: python patches/apply_v101_my_earth_brand.py source
 
       - name: Run static lifecycle checks
         working-directory: source
