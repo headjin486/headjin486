@@ -13,6 +13,7 @@ permissions:
   contents: read
 
 # v0.10.0: compact summary/badge row and softly feathered reveal edges
+# v0.10.0: robust DST_OUT edge feathering patch
 jobs:
   build:
     runs-on: ubuntu-latest
