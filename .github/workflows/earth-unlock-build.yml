@@ -129,6 +129,9 @@ jobs:
       - name: Apply v0.9.0 shared-canvas fog and original text location button
         run: python patches/apply_v090_shared_fog_canvas.py source
 
+      - name: Apply v0.9.1 fog overscan and GPS precision
+        run: python patches/apply_v091_fog_gps_precision.py source
+
       - name: Run static lifecycle checks
         working-directory: source
         run: |
