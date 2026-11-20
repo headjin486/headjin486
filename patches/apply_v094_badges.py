@@ -95,14 +95,15 @@ service.write_text(s, encoding="utf-8")
 
 activity = pkg / "MainActivity.kt"
 a = activity.read_text(encoding="utf-8")
-anchor = "        panel.addView(row1); panel.addView(row2); panel.addView(privacy); root.addView(panel); setContentView(root)\n"
-if anchor not in a: raise SystemExit("MainActivity panel anchor missing")
+anchor = "        panel.addView(privacy, LinearLayout.LayoutParams(-1, dp(40)).apply { topMargin = dp(2) })\n"
+if anchor not in a: raise SystemExit("MainActivity privacy button anchor missing")
 replacement = """        val badgesButton = Button(this).apply {
             text = "🏅  나의 배지"
-            isAllCaps = false
             setOnClickListener { showBadges() }
+            styleActionButton(this, primary = false, compact = true)
         }
-        panel.addView(row1); panel.addView(row2); panel.addView(privacy); panel.addView(badgesButton); root.addView(panel); setContentView(root)
+        panel.addView(privacy, LinearLayout.LayoutParams(-1, dp(40)).apply { topMargin = dp(2) })
+        panel.addView(badgesButton, LinearLayout.LayoutParams(-1, dp(40)).apply { topMargin = dp(4) })
 """
 a = a.replace(anchor, replacement, 1)
 anchor = "    private fun openAppSettings() {\n"
