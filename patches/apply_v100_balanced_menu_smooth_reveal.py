@@ -48,12 +48,16 @@ activity.write_text(a, encoding="utf-8")
 
 fog = pkg / "FogOverlay.kt"
 f = fog.read_text(encoding="utf-8")
-import re
-matches = list(re.finditer(r"(?m)^\\s*xfermode\\s*=.*PorterDuff\\.Mode\\.(?:DST_OUT|CLEAR).*$", f))
-if len(matches) != 1:
-    raise SystemExit("Expected one reveal erase xfermode line, found " + str(len(matches)))
-pos = matches[0].end()
-f = f[:pos] + "\\n        maskFilter = android.graphics.BlurMaskFilter(3.5f, android.graphics.BlurMaskFilter.Blur.NORMAL)" + f[pos:]
+old_draw = "            canvas.drawCircle(center.x.toFloat(), center.y.toFloat(), radiusPx, erasePaint)"
+new_draw = """            // A low-opacity outer pass feathers the visible edge; the inner pass
+            // remains fully transparent. Only rendering changes, not explored cells.
+            erasePaint.alpha = 72
+            canvas.drawCircle(center.x.toFloat(), center.y.toFloat(), radiusPx + 2.5f, erasePaint)
+            erasePaint.alpha = 255
+            canvas.drawCircle(center.x.toFloat(), center.y.toFloat(), radiusPx, erasePaint)"""
+if f.count(old_draw) != 1:
+    raise SystemExit("Reveal circle draw anchor missing or ambiguous")
+f = f.replace(old_draw, new_draw, 1)
 fog.write_text(f, encoding="utf-8")
 
 gradle = root / "app/build.gradle.kts"
@@ -69,7 +73,7 @@ v = verify.read_text(encoding="utf-8")
 v += """
 # v0.10.0 balanced summary/badge row and feathered reveal edges.
 grep -F 'panel.addView(summaryRow, 0)' app/src/main/java/com/earthunlock/app/MainActivity.kt >/dev/null
-grep -F 'BlurMaskFilter(3.5f' app/src/main/java/com/earthunlock/app/FogOverlay.kt >/dev/null
+grep -F 'radiusPx + 2.5f' app/src/main/java/com/earthunlock/app/FogOverlay.kt >/dev/null
 grep -F 'versionCode = 54' app/build.gradle.kts >/dev/null
 grep -F 'versionName = "0.10.0"' app/build.gradle.kts >/dev/null
 """
