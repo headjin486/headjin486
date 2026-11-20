@@ -147,6 +147,9 @@ jobs:
       - name: Apply v0.9.7 compact side-by-side settings footer
         run: python patches/apply_v097_compact_settings_footer.py source
 
+      - name: Apply v0.9.8 lighter map fog
+        run: python patches/apply_v098_lighter_map_fog.py source
+
       - name: Run static lifecycle checks
         working-directory: source
         run: |
