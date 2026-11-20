@@ -46,7 +46,7 @@ translations = {
 }
 
 def set_string(xml, key, value, required=True):
-    pattern = re.compile(r'(<string\\s+name="' + re.escape(key) + r'"[^>]*>).*?(</string>)', re.S)
+    pattern = re.compile(r'(<string\s+name="' + re.escape(key) + r'"[^>]*>).*?(</string>)', re.S)
     updated, count = pattern.subn(lambda m: m.group(1) + value + m.group(2), xml, count=1)
     if count == 0:
         if required:
@@ -72,7 +72,7 @@ for relative, values in translations.items():
 # Add a restrained brand tagline below the existing title.
 activity = pkg / "MainActivity.kt"
 a = activity.read_text(encoding="utf-8")
-anchor = "        root.addView(header)\\n"
+anchor = "        root.addView(header)\n"
 if anchor not in a:
     raise SystemExit("MainActivity header placement anchor missing")
 tagline = """        root.addView(header)
@@ -121,7 +121,7 @@ icon.write_text(r'''<vector xmlns:android="http://schemas.android.com/apk/res/an
 
 colors = res / "values/colors.xml"
 c = colors.read_text(encoding="utf-8")
-c = re.sub(r'(<color name="launcher_background">).*?(</color>)', r'\\g<1>#142B35\\g<2>', c, count=1)
+c = re.sub(r'(<color name="launcher_background">).*?(</color>)', r'\g<1>#142B35\g<2>', c, count=1)
 colors.write_text(c, encoding="utf-8")
 
 styles = res / "values/styles.xml"
