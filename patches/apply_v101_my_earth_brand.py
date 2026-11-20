@@ -72,11 +72,10 @@ for relative, values in translations.items():
 # Add a restrained brand tagline below the existing title.
 activity = pkg / "MainActivity.kt"
 a = activity.read_text(encoding="utf-8")
-anchor = "        root.addView(header)\n"
+anchor = "        map = MapView(this).apply {"
 if anchor not in a:
-    raise SystemExit("MainActivity header placement anchor missing")
-tagline = """        root.addView(header)
-        val brandTagline = TextView(this).apply {
+    raise SystemExit("MainActivity map placement anchor missing")
+tagline = """        val brandTagline = TextView(this).apply {
             text = getString(R.string.brand_tagline)
             textSize = 10.5f
             letterSpacing = 0.08f
@@ -85,7 +84,7 @@ tagline = """        root.addView(header)
         }
         root.addView(brandTagline)
 """
-a = a.replace(anchor, tagline, 1)
+a = a.replace(anchor, tagline + anchor, 1)
 a = a.replace("나의 탐험 기록", "나의 발자취 기록")
 activity.write_text(a, encoding="utf-8")
 
