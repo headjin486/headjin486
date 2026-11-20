@@ -7,7 +7,7 @@ activity = pkg / "MainActivity.kt"
 a = activity.read_text(encoding="utf-8")
 
 # Remove the existing location-permission row before inserting it in the desired position.
-settings_row = '        panel.addView(row2, LinearLayout.LayoutParams(-1, dp(44)).apply { topMargin = dp(8) })\\n'
+settings_row = '        panel.addView(row2, LinearLayout.LayoutParams(-1, dp(44)).apply { topMargin = dp(8) })\n'
 if settings_row not in a:
     raise SystemExit("location permission row anchor missing")
 a = a.replace(settings_row, "", 1)
