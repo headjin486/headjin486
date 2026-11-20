@@ -153,6 +153,9 @@ jobs:
       - name: Apply v0.9.9 lighter map fog
         run: python patches/apply_v099_lighter_map_fog.py source
 
+      - name: Apply v0.10.0 balanced menu and smooth reveal edges
+        run: python patches/apply_v100_balanced_menu_smooth_reveal.py source
+
       - name: Run static lifecycle checks
         working-directory: source
         run: |
