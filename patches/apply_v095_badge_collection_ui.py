@@ -10,11 +10,18 @@ old_order = """        panel.addView(privacy, LinearLayout.LayoutParams(-1, dp(4
         panel.addView(badgesButton, LinearLayout.LayoutParams(-1, dp(40)).apply { topMargin = dp(4) })
 """
 new_order = """        panel.addView(badgesButton, LinearLayout.LayoutParams(-1, dp(40)).apply { topMargin = dp(2) })
+        panel.addView(row2, LinearLayout.LayoutParams(-1, dp(44)).apply { topMargin = dp(8) })
         panel.addView(privacy, LinearLayout.LayoutParams(-1, dp(40)).apply { topMargin = dp(4) })
 """
 if old_order not in a:
     raise SystemExit("v0.9.4 menu order anchor missing")
 a = a.replace(old_order, new_order, 1)
+
+# Move the location-permission settings row below the badge button.
+settings_row = '        panel.addView(row2, LinearLayout.LayoutParams(-1, dp(44)).apply { topMargin = dp(8) })\n'
+if settings_row not in a:
+    raise SystemExit("location permission row anchor missing")
+a = a.replace(settings_row, "", 1)
 
 start = a.find("    private fun showBadges() {")
 end = a.find("    private fun openAppSettings() {", start)
@@ -175,4 +182,26 @@ for old, new in replacements.items():
         raise SystemExit("Badge description anchor missing: " + old)
     b = b.replace(old, new, 1)
 badge.write_text(b, encoding="utf-8")
+
+# Align package metadata with the v0.9.5 release.
+gradle = root / "app/build.gradle.kts"
+g = gradle.read_text(encoding="utf-8")
+if 'versionCode = 48' not in g or 'versionName = "0.9.4"' not in g:
+    raise SystemExit("Unexpected base version; refusing unsafe version bump")
+g = g.replace('versionCode = 48', 'versionCode = 49', 1)
+g = g.replace('versionName = "0.9.4"', 'versionName = "0.9.5"', 1)
+gradle.write_text(g, encoding="utf-8")
+
+verify = root / "scripts/verify-service-lifecycle.sh"
+v = verify.read_text(encoding="utf-8")
+v = v.replace("versionCode = 48", "versionCode = 49")
+v = v.replace('versionName = "0.9.4"', 'versionName = "0.9.5"')
+v += """
+# v0.9.5 badge order and descriptive collection UI.
+grep -F 'panel.addView(badgesButton' app/src/main/java/com/earthunlock/app/MainActivity.kt >/dev/null
+grep -F '나의 탐험 기록' app/src/main/java/com/earthunlock/app/MainActivity.kt >/dev/null
+grep -F 'badge.description' app/src/main/java/com/earthunlock/app/MainActivity.kt >/dev/null
+"""
+verify.write_text(v, encoding="utf-8")
+
 print("EARTH UNLOCK v0.9.5 badge collection UI patch applied")
