@@ -138,6 +138,9 @@ jobs:
       - name: Apply v0.9.3 continuous travel-heading follow
         run: python patches/apply_v093_continuous_heading.py source
 
+      - name: Apply v0.9.4 explorer badge system
+        run: python patches/apply_v094_badges.py source
+
       - name: Run static lifecycle checks
         working-directory: source
         run: |
