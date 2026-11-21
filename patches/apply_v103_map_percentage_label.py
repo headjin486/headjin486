@@ -35,3 +35,5 @@ grep -F 'versionName = "0.10.3"' app/build.gradle.kts >/dev/null
 """
 verify.write_text(v, encoding="utf-8")
 print("MY EARTH v0.10.3 clarified map percentage denominator; calculation and user data unchanged")
+
+# Rebuild trigger: map percentage explanatory label only.
