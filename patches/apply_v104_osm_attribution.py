@@ -25,9 +25,9 @@ replacement = '''\g<indent>val attribution = TextView(this).apply {
                 startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.openstreetmap.org/copyright")))
             }
         }
-        mapFrame.addView(attribution, FrameLayout.LayoutParams(-2, -2, Gravity.BOTTOM or Gravity.END).apply {
-            bottomMargin = 10
-            marginEnd = 10
+        mapFrame.addView(attribution, FrameLayout.LayoutParams(-2, -2, Gravity.TOP or Gravity.START).apply {
+            topMargin = 10
+            marginStart = 10
         })'''
 s2, n = re.subn(pattern, replacement, s, count=1, flags=re.M)
 if n != 1:
@@ -61,11 +61,11 @@ gradle = root / "app/build.gradle.kts"
 g = gradle.read_text(encoding="utf-8")
 if 'versionCode = 57' not in g or 'versionName = "0.10.3"' not in g:
     raise SystemExit("Unexpected base version; refusing unsafe version bump")
-g = g.replace('versionCode = 57', 'versionCode = 58', 1)
-g = g.replace('versionName = "0.10.3"', 'versionName = "0.10.4"', 1)
+g = g.replace('versionCode = 57', 'versionCode = 59', 1)
+g = g.replace('versionName = "0.10.3"', 'versionName = "0.10.5"', 1)
 gradle.write_text(g, encoding="utf-8")
 
 assert 'mapFrame.addView(attribution' in s2 and 'root.addView(attribution)' not in s2
 assert '@drawable/my_earth_user_icon' in adaptive.read_text(encoding="utf-8")
 assert (drawable / "my_earth_user_icon.jpg").stat().st_size > 500
-print("v0.10.4 verified: compact OSM overlay and supplied icon image applied")
+print("v0.10.5 verified: top-left OSM overlay and supplied icon image applied")
