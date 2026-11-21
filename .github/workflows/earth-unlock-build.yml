@@ -141,6 +141,8 @@ jobs:
         run: python patches/apply_v107_approved_original_icon.py source
       - name: Apply v0.10.9 adaptive icon safe-zone scaling
         run: python patches/apply_v108_icon_safezone.py source
+      - name: Apply v0.10.10 larger adaptive icon artwork
+        run: python patches/apply_v1010_icon_scale.py source
       - name: Run static lifecycle checks
         working-directory: source
         run: |
