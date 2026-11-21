@@ -9,8 +9,8 @@ p = files[0]
 s = p.read_text(encoding="utf-8")
 
 # Add the OSM attribution overlay without changing or replacing launcher artwork.
-pattern = r'(?P<indent>^[ \\t]*)val attribution = TextView\\(this\\)\\.apply \\{[\\s\\S]*?^[ \\t]*\\}\\n[ \\t]*root\\.addView\\(attribution\\)'
-replacement = r'''\\g<indent>val attribution = TextView(this).apply {
+pattern = r'(?P<indent>^[ \t]*)val attribution = TextView\(this\)\.apply \{[\s\S]*?^[ \t]*\}\n[ \t]*root\.addView\(attribution\)'
+replacement = r'''\g<indent>val attribution = TextView(this).apply {
             text = "© OpenStreetMap contributors · ODbL"
             textSize = 10f
             setTextColor(Color.rgb(235, 241, 246))
