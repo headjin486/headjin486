@@ -1,37 +1,40 @@
-# EARTH UNLOCK Firebase 연결 준비 (Spark 무료 단계)
+# MY EARTH Firebase 연결 단계 (Spark 무료 단계)
 
-## 현재 상태
-- Android applicationId / namespace: `com.earthunlock.app` (v0.8.1부터 고정)
-- 앱 내부 닉네임 저장은 구현되어 있지만 Firebase 계정·동기화·랭킹 연결은 아직 미구현
-- 아래 Firestore 규칙은 저장소에 준비한 초안이며 Firebase 프로젝트에 아직 배포되지 않음
-- Cloud Functions 및 Blaze 결제 요금제는 사용자 별도 승인 전까지 사용하지 않음
+## 현재 확인된 상태
+- Android 패키지 ID: com.earthunlock.app
+- Firebase Android 앱 등록 및 google-services.json 다운로드 완료
+- GitHub Actions Secret GOOGLE_SERVICES_JSON 등록 완료(사용자 확인)
+- 빌드 워크플로에서 설정 파일을 앱 모듈에 배치하고 Google Services 플러그인을 적용하도록 구성
+- 앱의 Firebase 익명 인증·Firestore 백업 코드는 아직 구현/검증 단계다.
+- 기존 로컬 탐험 데이터는 유지한다. 앱 삭제나 데이터 초기화는 하지 않는다.
 
-## Firebase Console에서 필요한 작업
-1. Firebase Console에서 새 프로젝트를 생성한다. Google Analytics는 지금 단계에서 켜지 않아도 된다.
-2. Android 앱 추가 시 패키지 이름을 정확히 `com.earthunlock.app`으로 입력한다.
-3. `google-services.json`을 내려받는다. 이 파일을 공개 저장소에 올리지 않는다.
-4. Authentication에서 익명 로그인을 활성화한다.
-5. Firestore Database를 생성하고, 지역은 실제 주요 이용자와 데이터 거주 요구를 고려해 선택한다.
-6. 이 저장소의 `firebase/firestore.rules`를 Firebase Emulator Suite로 테스트한 뒤 Firebase Console Rules에 적용한다.
-7. 앱 등록 및 Firestore 설정이 끝나면 Android 구성 파일을 안전하게 빌드 환경에 전달해야 한다.
+## Firebase Console에서 사용자가 설정할 항목
+1. Firebase Console → Build → Authentication → Get started
+2. Sign-in method에서 Anonymous를 활성화하고 저장한다.
+3. Build → Firestore Database → Create database를 선택한다.
+4. 처음에는 Production mode를 선택하고, 실제 운영 지역을 고려해 위치를 결정한다.
+5. Firestore Rules 탭에는 저장소의 firebase/firestore.rules를 테스트한 뒤 적용한다. 아직 앱 연동 검증 전에는 임의로 넓은 공개 규칙을 적용하지 않는다.
+6. Google 로그인은 추후 단계에서 설정한다. 그때 SHA-1/SHA-256 지문과 OAuth 구성을 확인한다.
+
+## 데이터·비용 보호
+- Spark 무료 요금제만 사용한다. Blaze 전환 및 결제 계정 연결은 별도 동의 없이 하지 않는다.
+- Google Analytics는 현재 추가하지 않는다.
+- Firebase에 업로드할 대상은 5m 해금 셀 식별자뿐이다. GPS 좌표와 시간순 이동 경로는 업로드하지 않는다.
+- Google 계정 연결 전 익명 UID는 기기 분실·앱 데이터 삭제 시 복구할 수 없으므로 앱에서 경고한다.
+- 앱 데이터 삭제/재설치 또는 기존 앱 제거를 아직 하지 않는다.
 
 ## 구현·검증 순서
-1. 익명 인증으로 UID 발급 및 재실행 시 세션 유지 확인
-2. 닉네임 예약 트랜잭션과 중복 닉네임 동시 등록 테스트 (프로필·예약 문서의 원자적 갱신)
-3. 기기 내 SQLite explored_cells와 클라우드 백업 청크의 버전/압축 포맷 확정
-4. 업로드·복구는 셀 집합 병합(INSERT OR IGNORE)으로 구현하고, 네트워크 실패 시 로컬 탐험을 중단하지 않도록 처리
-5. TOP 30 조회와 내 순위 표시 연결
-6. 앱 데이터 삭제·새 기기 복구·중복 업로드·오프라인 복귀 테스트
+1. 익명 인증 UID 생성 및 앱 재실행 후 동일 UID 유지
+2. 기존 SQLite explored_cells의 5m 셀을 압축 청크로 백업
+3. 클라우드 청크를 기존 SQLite에 합집합 병합하고 면적 통계 재계산
+4. 네트워크 차단/복구 시 로컬 사용 지속 및 동기화 재시도
+5. 기존 익명 계정을 Google 계정에 연결
+6. 새 기기/재설치 복원과 계정 삭제를 테스트
+7. 개인정보 처리방침 및 Google Play Data safety 응답을 실제 데이터 흐름과 일치시킴
 
-## 비용과 점수 신뢰성
-- 이 준비 단계는 Firebase Spark 무료 요금제를 전제로 한다.
-- Cloud Functions 배포 또는 Blaze 전환은 하지 않는다.
-- Spark에서 클라이언트가 제출하는 탐험 면적은 변조 가능하므로 '잠정 랭킹'으로 표시해야 한다.
-- 공식 서버 검증 랭킹이 필요하면 별도 비용·보안 검토와 사용자 승인을 받은 후 진행한다.
-
-## 개인정보 및 출시 차단 항목
-- 실제 운영자명과 연락처, 공개 개인정보 처리방침 URL 확정
-- 닉네임·계정·탐험 셀 백업의 수집 목적, 보유 기간, 삭제 방법 명시
-- 계정 삭제 시 프로필·닉네임 예약·랭킹·백업을 모두 삭제하는 흐름 구현
-- Google Play Data safety 응답과 실제 SDK/데이터 흐름 대조
-- Firestore 보안 규칙 테스트 및 앱 실기기 복구 테스트
+## 출시 차단 항목
+- Google 계정 연결·복원 실기기 테스트
+- 계정 삭제 시 Firebase Auth 사용자 및 백업 청크 전체 삭제
+- Firestore 보안 규칙 Emulator 테스트
+- Firebase App Check 적용
+- 개인정보 처리방침, 데이터 보유·삭제 기준 및 Play Data safety 검증
