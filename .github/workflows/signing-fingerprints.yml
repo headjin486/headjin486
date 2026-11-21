@@ -1,0 +1,37 @@
+name: MY EARTH Signing Certificate Fingerprints
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fingerprints:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Read persistent signing certificate fingerprints
+        env:
+          ANDROID_SIGNING_BUNDLE: ${{ secrets.ANDROID_SIGNING_BUNDLE }}
+        run: |
+          test -n "$ANDROID_SIGNING_BUNDLE" || { echo "ANDROID_SIGNING_BUNDLE secret is missing"; exit 1; }
+          python - <<'PY'
+          import os, base64
+          from pathlib import Path
+          values = {}
+          for line in os.environ["ANDROID_SIGNING_BUNDLE"].splitlines():
+              if "=" in line:
+                  key, value = line.split("=", 1)
+                  values[key.strip()] = value.strip()
+          required = ["storePassword", "keyAlias", "keystoreBase64"]
+          missing = [key for key in required if not values.get(key)]
+          if missing:
+              raise SystemExit("Signing bundle missing fields: " + ", ".join(missing))
+          Path("upload-key.jks").write_bytes(base64.b64decode(values["keystoreBase64"], validate=True))
+          PY
+          keytool -list -v -keystore upload-key.jks -storepass "$(python -c 'import os; v=dict(x.split("=",1) for x in os.environ["ANDROID_SIGNING_BUNDLE"].splitlines() if "=" in x); print(v["storePassword"])')" -alias "$(python -c 'import os; v=dict(x.split("=",1) for x in os.environ["ANDROID_SIGNING_BUNDLE"].splitlines() if "=" in x); print(v["keyAlias"])')" | grep -E 'SHA1:|SHA256:'
