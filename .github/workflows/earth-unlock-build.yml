@@ -163,6 +163,8 @@ jobs:
         run: python patches/apply_v1015_backup_delete_access.py source
       - name: Apply v0.10.16 cloud backup status and error reporting
         run: python patches/apply_v1016_backup_status.py source
+      - name: Apply v0.10.17 backup build fix
+        run: python patches/apply_v1017_backup_build_fix.py source
       - name: Run static lifecycle checks
         working-directory: source
         run: |
