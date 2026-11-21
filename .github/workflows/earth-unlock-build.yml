@@ -27,6 +27,14 @@ jobs:
           test -f source/settings.gradle.kts
           test -f source/app/build.gradle.kts
           sed -i 's/private const val POLICY_TEXT/private val POLICY_TEXT/' source/app/src/main/java/com/example/earthexplorer/PrivacyPolicyActivity.kt
+      - name: Configure Firebase Android app
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          test -n "$GOOGLE_SERVICES_JSON" || { echo "GOOGLE_SERVICES_JSON secret is missing"; exit 1; }
+          mkdir -p source/app
+          printf '%s' "$GOOGLE_SERVICES_JSON" > source/app/google-services.json
+          python patches/configure_firebase.py source
 
       - name: Apply v0.7.5 app improvements
         run: python patches/apply_v075.py source
