@@ -155,6 +155,8 @@ jobs:
         run: python patches/apply_v1011_icon_scale.py source
       - name: Apply v0.10.12 Firebase opt-in cell backup
         run: python patches/apply_v1012_firebase_cell_backup.py source
+      - name: Apply v0.10.13 Firebase UID reuse
+        run: python patches/apply_v1013_firebase_uid_reuse.py source
       - name: Run static lifecycle checks
         working-directory: source
         run: |
