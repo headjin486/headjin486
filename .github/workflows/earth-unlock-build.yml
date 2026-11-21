@@ -13,7 +13,7 @@ on:
 permissions:
   contents: read
 
-# MY EARTH v0.10.4: verified source icon bytes and compact OSM attribution
+# MY EARTH v0.10.9: adaptive launcher icon safe-zone correction
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -130,15 +130,17 @@ jobs:
         run: python patches/apply_v103_map_percentage_label.py source
       - name: Apply v0.10.5 top-left OSM attribution overlay
         run: python patches/apply_v104_osm_attribution.py source
-      - name: Install SVG renderer for high-resolution launcher icon
+      - name: Install image tools for high-resolution launcher icon
         run: |
           sudo apt-get update
           sudo apt-get install -y fonts-noto-cjk
-          python -m pip install --disable-pip-version-check cairosvg
+          python -m pip install --disable-pip-version-check cairosvg pillow
       - name: Apply v0.10.6 high-resolution bilingual MY EARTH icon
         run: python patches/apply_v106_vector_icon.py source
       - name: Apply v0.10.7 exact approved MY EARTH artwork
         run: python patches/apply_v107_approved_original_icon.py source
+      - name: Apply v0.10.9 adaptive icon safe-zone scaling
+        run: python patches/apply_v108_icon_safezone.py source
       - name: Run static lifecycle checks
         working-directory: source
         run: |
