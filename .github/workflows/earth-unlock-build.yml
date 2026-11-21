@@ -159,6 +159,8 @@ jobs:
         run: python patches/apply_v1013_firebase_uid_reuse.py source
       - name: Apply v0.10.14 Google account recovery
         run: python patches/apply_v1014_google_recovery.py source
+      - name: Apply v0.10.15 cloud backup deletion access
+        run: python patches/apply_v1015_backup_delete_access.py source
       - name: Run static lifecycle checks
         working-directory: source
         run: |
