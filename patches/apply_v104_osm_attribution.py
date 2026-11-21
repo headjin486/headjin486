@@ -52,7 +52,7 @@ adaptive.write_text('''<adaptive-icon xmlns:android="http://schemas.android.com/
 
 colors = res / "values/colors.xml"
 c = colors.read_text(encoding="utf-8")
-c, ncolor = re.subn(r'(<color name="launcher_background">).*?(</color>)', r'\\g<1>#FFFFFF\\g<2>', c, count=1)
+c, ncolor = re.subn(r'(<color name="launcher_background">).*?(</color>)', lambda m: m.group(1) + '#FFFFFF' + m.group(2), c, count=1)
 if ncolor != 1:
     raise SystemExit("Launcher background color resource missing")
 colors.write_text(c, encoding="utf-8")
