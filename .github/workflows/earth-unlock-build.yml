@@ -127,6 +127,8 @@ jobs:
         run: python patches/apply_v102_my_earth_icon.py source
       - name: Apply v0.10.3 clarify map percentage denominator
         run: python patches/apply_v103_map_percentage_label.py source
+      - name: Apply v0.10.4 compact OSM attribution overlay
+        run: python patches/apply_v104_osm_attribution.py source
       - name: Run static lifecycle checks
         working-directory: source
         run: |
