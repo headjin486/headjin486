@@ -8,16 +8,17 @@ if len(matches) != 1:
 activity = matches[0]
 text = activity.read_text(encoding="utf-8")
 
-# Preserve the existing percentage calculation and add only its denominator label.
-pattern = r'(countText\.text\s*=\s*"[^"\n]*\\n\$percentLabel)(\\n[^"]*")'
+# Change only the visible text adjacent to the existing percentage variable.
+pattern = r'countText\.text\s*=\s*"[^"]*\$percentLabel[^"]*"'
 updated, count = re.subn(
     pattern,
-    lambda m: m.group(1) + ' (지구 전체 지도 대비)' + m.group(2),
+    lambda m: m.group(0).replace("$percentLabel", "$percentLabel (지구 전체 지도 대비)", 1),
     text,
     count=1
 )
 if count != 1:
-    raise SystemExit("Main map percentage display anchor missing or ambiguous")
+    candidates = [line.strip() for line in text.splitlines() if "percentLabel" in line]
+    raise SystemExit("Map percentage display anchor missing or ambiguous: " + repr(candidates))
 activity.write_text(updated, encoding="utf-8")
 
 gradle = root / "app/build.gradle.kts"
@@ -32,7 +33,7 @@ verify = root / "scripts/verify-service-lifecycle.sh"
 v = verify.read_text(encoding="utf-8")
 v += """
 # v0.10.3 clarify that the map percentage is measured against the whole Earth map.
-grep -F '지구 전체 지도 대비' app/src/main/java >/dev/null
+grep -R -F '지구 전체 지도 대비' app/src/main/java >/dev/null
 grep -F 'versionCode = 57' app/build.gradle.kts >/dev/null
 grep -F 'versionName = "0.10.3"' app/build.gradle.kts >/dev/null
 """
