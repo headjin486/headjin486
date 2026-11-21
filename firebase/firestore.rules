@@ -4,57 +4,16 @@ service cloud.firestore {
     function signedIn() { return request.auth != null; }
     function owns(uid) { return signedIn() && request.auth.uid == uid; }
 
-    function validProfile(data) {
-      return data.keys().hasOnly(['nickname', 'nicknameNormalized', 'createdAt', 'updatedAt', 'recoveryProvider'])
-        && data.keys().hasAll(['nickname', 'nicknameNormalized', 'createdAt', 'updatedAt', 'recoveryProvider'])
-        && data.nickname is string && data.nickname.size() >= 2 && data.nickname.size() <= 12
-        && data.nicknameNormalized is string && data.nicknameNormalized.size() >= 2 && data.nicknameNormalized.size() <= 48
-        && data.createdAt is timestamp && data.updatedAt is timestamp
-        && data.recoveryProvider in ['none', 'google'];
-    }
-
-    match /profiles/{uid} {
-      allow get: if owns(uid);
-      allow list: if false;
-      allow create: if owns(uid) && validProfile(request.resource.data);
-      allow update: if owns(uid) && validProfile(request.resource.data)
-        && request.resource.data.createdAt == resource.data.createdAt;
-      allow delete: if owns(uid);
-    }
-
-    match /nickname_claims/{nicknameNormalized} {
-      allow get: if signedIn();
-      allow list: if false;
-      allow create: if signedIn()
-        && request.resource.data.keys().hasOnly(['uid', 'createdAt'])
-        && request.resource.data.keys().hasAll(['uid', 'createdAt'])
-        && request.resource.data.uid == request.auth.uid
-        && request.resource.data.createdAt is timestamp;
-      allow update: if false;
-      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
-    }
-
-    // Public read, owner-only writes. Spark client scores are provisional, not verified.
-    match /leaderboard/{uid} {
-      allow get, list: if true;
-      allow create, update: if owns(uid)
-        && request.resource.data.keys().hasOnly(['nickname', 'exploredAreaM2', 'exploredCellCount', 'updatedAt'])
-        && request.resource.data.keys().hasAll(['nickname', 'exploredAreaM2', 'exploredCellCount', 'updatedAt'])
-        && request.resource.data.nickname is string
-        && request.resource.data.nickname.size() >= 2 && request.resource.data.nickname.size() <= 12
-        && request.resource.data.exploredAreaM2 is number && request.resource.data.exploredAreaM2 >= 0
-        && request.resource.data.exploredCellCount is int && request.resource.data.exploredCellCount >= 0
-        && request.resource.data.updatedAt is timestamp;
-      allow delete: if owns(uid);
-    }
-
+    // Only revealed 5 m grid-cell identifiers are stored. Never store raw GPS tracks.
     match /exploration_backups/{uid}/chunks/{chunkId} {
       allow read, delete: if owns(uid);
       allow create, update: if owns(uid)
         && request.resource.data.keys().hasOnly(['formatVersion', 'payload', 'updatedAt'])
         && request.resource.data.keys().hasAll(['formatVersion', 'payload', 'updatedAt'])
-        && request.resource.data.formatVersion is int && request.resource.data.formatVersion >= 1
-        && request.resource.data.payload is string && request.resource.data.payload.size() <= 700000
+        && request.resource.data.formatVersion is int
+        && request.resource.data.formatVersion == 1
+        && request.resource.data.payload is string
+        && request.resource.data.payload.size() <= 700000
         && request.resource.data.updatedAt is timestamp;
     }
   }
