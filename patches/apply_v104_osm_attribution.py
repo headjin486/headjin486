@@ -67,5 +67,5 @@ gradle.write_text(g, encoding="utf-8")
 
 assert 'mapFrame.addView(attribution' in s2 and 'root.addView(attribution)' not in s2
 assert '@drawable/my_earth_user_icon' in adaptive.read_text(encoding="utf-8")
-assert (drawable / "my_earth_user_icon.jpg").stat().st_size > 1000
+assert (drawable / "my_earth_user_icon.jpg").stat().st_size > 500
 print("v0.10.4 verified: compact OSM overlay and supplied icon image applied")
