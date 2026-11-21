@@ -136,6 +136,8 @@ jobs:
           python -m pip install --disable-pip-version-check cairosvg
       - name: Apply v0.10.6 high-resolution bilingual MY EARTH icon
         run: python patches/apply_v106_vector_icon.py source
+      - name: Apply v0.10.7 exact approved MY EARTH artwork
+        run: python patches/apply_v107_approved_original_icon.py source
       - name: Run static lifecycle checks
         working-directory: source
         run: |
