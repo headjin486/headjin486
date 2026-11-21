@@ -12,7 +12,7 @@ on:
 permissions:
   contents: read
 
-# MY EARTH v0.10.4: apply user-approved icon artwork and compact OSM attribution
+# MY EARTH v0.10.4: verified source icon bytes and compact OSM attribution
 jobs:
   build:
     runs-on: ubuntu-latest
