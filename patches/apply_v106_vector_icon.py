@@ -41,9 +41,9 @@ svg = r"""<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" vie
  <path d="M468 260 Q512 286 556 260 L564 324 Q512 352 460 324Z" fill="#E9FFF4" stroke="#004A35" stroke-width="10" stroke-linejoin="round"/>
  <path d="M493 225 L531 225" stroke="#004A35" stroke-width="10" stroke-linecap="round"/>
  <!-- Title -->
- <text x="512" y="790" text-anchor="middle" font-family="DejaVu Sans, Noto Sans CJK KR, sans-serif" font-size="112" font-weight="800" letter-spacing="-5" fill="#FFFFFF">MY <tspan fill="#B8FF65">EARTH</tspan></text>
- <path d="M215 855 H340 M684 855 H809" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round" opacity=".9"/>
- <text x="512" y="880" text-anchor="middle" font-family="Noto Sans CJK KR, NanumGothic, sans-serif" font-size="68" font-weight="700" fill="#FFFFFF">마이 어스</text>
+ <text x="512" y="748" text-anchor="middle" font-family="DejaVu Sans, Noto Sans CJK KR, sans-serif" font-size="112" font-weight="800" letter-spacing="-5" fill="#FFFFFF">MY <tspan fill="#B8FF65">EARTH</tspan></text>
+ <path d="M215 805 H340 M684 805 H809" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round" opacity=".9"/>
+ <text x="512" y="842" text-anchor="middle" font-family="Noto Sans CJK KR, NanumGothic, sans-serif" font-size="68" font-weight="700" fill="#FFFFFF">마이 어스</text>
 </g>
 </svg>"""
 svg_path = root / "my_earth_icon_v106.svg"
