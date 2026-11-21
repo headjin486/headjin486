@@ -143,6 +143,8 @@ jobs:
         run: python patches/apply_v108_icon_safezone.py source
       - name: Apply v0.10.10 larger adaptive icon artwork
         run: python patches/apply_v1010_icon_scale.py source
+      - name: Apply v0.10.11 final 78 percent icon scale
+        run: python patches/apply_v1011_icon_scale.py source
       - name: Run static lifecycle checks
         working-directory: source
         run: |
