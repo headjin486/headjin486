@@ -2,14 +2,17 @@ from pathlib import Path
 import re, sys
 
 root = Path(sys.argv[1])
-activity = root / "app/src/main/java/com/earthunlock/app/MainActivity.kt"
+matches = list((root / "app/src/main/java").rglob("MainActivity.kt"))
+if len(matches) != 1:
+    raise SystemExit(f"Expected one MainActivity.kt under app/src/main/java, found {len(matches)}")
+activity = matches[0]
 text = activity.read_text(encoding="utf-8")
 
-# Clarify the denominator beside the existing percentage; preserve the calculation.
-pattern = r'countText\.text\s*=\s*"([^"\n]*\\n)\$percentLabel(\\n[^"]*)"'
+# Preserve the existing percentage calculation and add only its denominator label.
+pattern = r'(countText\.text\s*=\s*"[^"\n]*\\n\$percentLabel)(\\n[^"]*")'
 updated, count = re.subn(
     pattern,
-    lambda m: 'countText.text = "' + m.group(1) + '$percentLabel (지구 전체 지도 대비)' + m.group(2) + '"',
+    lambda m: m.group(1) + ' (지구 전체 지도 대비)' + m.group(2),
     text,
     count=1
 )
@@ -29,11 +32,9 @@ verify = root / "scripts/verify-service-lifecycle.sh"
 v = verify.read_text(encoding="utf-8")
 v += """
 # v0.10.3 clarify that the map percentage is measured against the whole Earth map.
-grep -F '지구 전체 지도 대비' app/src/main/java/com/earthunlock/app/MainActivity.kt >/dev/null
+grep -F '지구 전체 지도 대비' app/src/main/java >/dev/null
 grep -F 'versionCode = 57' app/build.gradle.kts >/dev/null
 grep -F 'versionName = "0.10.3"' app/build.gradle.kts >/dev/null
 """
 verify.write_text(v, encoding="utf-8")
 print("MY EARTH v0.10.3 clarified map percentage denominator; calculation and user data unchanged")
-
-# Rebuild trigger: map percentage explanatory label only.
