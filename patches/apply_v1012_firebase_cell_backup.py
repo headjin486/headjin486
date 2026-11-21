@@ -206,7 +206,7 @@ activity = pkg / "MainActivity.kt"
 a = activity.read_text(encoding="utf-8")
 # Add a persistent, explicit opt-in control to the existing settings panel.
 if "MY_EARTH_CLOUD_BACKUP_BUTTON" not in a:
-    marker = re.search(r"(?m)^.*setContentView\\(root\\).*$", a)
+    marker = re.search(r"(?m)^.*setContentView[(]root[)].*$", a)
     if not marker:
         raise SystemExit("MainActivity setContentView insertion point missing")
     block = r'''
