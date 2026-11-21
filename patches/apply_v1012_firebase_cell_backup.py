@@ -206,8 +206,8 @@ activity = pkg / "MainActivity.kt"
 a = activity.read_text(encoding="utf-8")
 # Add a persistent, explicit opt-in control to the existing settings panel.
 if "MY_EARTH_CLOUD_BACKUP_BUTTON" not in a:
-    marker = "        setContentView(root)"
-    if marker not in a:
+    marker = re.search(r"(?m)^.*setContentView\\(root\\).*$", a)
+    if not marker:
         raise SystemExit("MainActivity setContentView insertion point missing")
     block = r'''
         // MY_EARTH_CLOUD_BACKUP_BUTTON: cloud backup is opt-in and never starts silently.
@@ -244,7 +244,7 @@ if "MY_EARTH_CLOUD_BACKUP_BUTTON" not in a:
         }
         panel.addView(cloudBackupButton, LinearLayout.LayoutParams(-1, -2))
 '''
-    a = a.replace(marker, block + "\n" + marker, 1)
+    a = a[:marker.start()] + block + "\n" + a[marker.start():]
 # Sync on launch/resume and after active tracking broadcasts; manager throttles repeated requests.
 if "FirebaseBackupManager.requestSyncIfEnabled(this@MainActivity, store)" not in a:
     a = a.replace("            refreshFog()\n            val lat = intent?", "            refreshFog()\n            FirebaseBackupManager.requestSyncIfEnabled(this@MainActivity, store)\n            val lat = intent?", 1)
