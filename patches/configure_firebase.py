@@ -21,20 +21,20 @@ app_text = app_gradle.read_text(encoding="utf-8")
 
 plugin_line = '    id("com.google.gms.google-services") version "4.4.2" apply false'
 if "com.google.gms.google-services" not in root_text:
-    match = re.search(r"plugins\\s*\\{", root_text)
+    match = re.search(r"plugins\s*\{", root_text)
     if not match:
         raise SystemExit("Root build.gradle.kts has no plugins block; manual Gradle integration required")
     insert_at = match.end()
-    root_text = root_text[:insert_at] + "\\n" + plugin_line + root_text[insert_at:]
+    root_text = root_text[:insert_at] + "\n" + plugin_line + root_text[insert_at:]
     root_gradle.write_text(root_text, encoding="utf-8")
 
 app_line = '    id("com.google.gms.google-services")'
 if "com.google.gms.google-services" not in app_text:
-    match = re.search(r"plugins\\s*\\{", app_text)
+    match = re.search(r"plugins\s*\{", app_text)
     if not match:
         raise SystemExit("App build.gradle.kts has no plugins block; manual Gradle integration required")
     insert_at = match.end()
-    app_text = app_text[:insert_at] + "\\n" + app_line + app_text[insert_at:]
+    app_text = app_text[:insert_at] + "\n" + app_line + app_text[insert_at:]
     app_gradle.write_text(app_text, encoding="utf-8")
 
 print("Firebase config validated and Google Services Gradle plugin configured.")
