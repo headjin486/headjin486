@@ -54,7 +54,7 @@ method = '''    private fun refreshBadgeCount(force: Boolean = false) {
         val badges = BadgeManager.badges(this, store)
         val unlocked = badges.count { it.unlocked }
         button.text = "🏅 배지 $unlocked/${badges.size}"
-        button.contentDescription = "나의 배지 컬렉션, $unlocked개 획득"
+        button.contentDescription = "나의 배지 컬렉션, ${unlocked}개 획득"
     }
 
 '''
