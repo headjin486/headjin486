@@ -6,21 +6,37 @@ pkg = root / "app/src/main/java/com/earthunlock/app"
 activity = pkg / "MainActivity.kt"
 a = activity.read_text(encoding="utf-8")
 
-# Add a clearly labeled in-app account deletion action beside account/backup controls.
-anchor = '        panel.addView(googleRecoveryButton, LinearLayout.LayoutParams(-1, -2))'
-if "MY_EARTH_ACCOUNT_DELETE_BUTTON" not in a:
-    if anchor not in a:
-        raise SystemExit("Google account recovery button anchor missing")
-    ui = r'''
-        // MY_EARTH_ACCOUNT_DELETE_BUTTON: permanent account + cloud data deletion.
-        val accountDeleteButton = Button(this).apply {
-            text = "계정 및 클라우드 데이터 삭제"
-            isAllCaps = false
-            setOnClickListener { confirmAccountDeletion() }
-        }
-        panel.addView(accountDeleteButton, LinearLayout.LayoutParams(-1, -2))
-'''
-    a = a.replace(anchor, anchor + "\n" + ui, 1)
+# Add the deletion action to the compact account menu introduced in v0.10.21.
+if "계정 및 클라우드 데이터 삭제" not in a:
+    old_items = 'setItems(arrayOf("클라우드 백업 설정 / 지금 백업", "Google 계정 연결 / 기기 변경 복원"))'
+    new_items = 'setItems(arrayOf("클라우드 백업 설정 / 지금 백업", "Google 계정 연결 / 기기 변경 복원", "계정 및 클라우드 데이터 삭제"))'
+    if old_items not in a:
+        raise SystemExit("Compact cloud/account menu anchor missing")
+    a = a.replace(old_items, new_items, 1)
+    old_else = '''                        } else {
+                            AlertDialog.Builder(this@MainActivity)
+                                .setTitle("Google 계정으로 기록 보호")'''
+    new_else = '''                        } else if (which == 1) {
+                            AlertDialog.Builder(this@MainActivity)
+                                .setTitle("Google 계정으로 기록 보호")'''
+    if old_else not in a:
+        raise SystemExit("Google account menu branch anchor missing")
+    a = a.replace(old_else, new_else, 1)
+    close = '''                                .setNegativeButton("취소", null)
+                                .show()
+                        }
+                    }
+                    .setNegativeButton("닫기", null)'''
+    new_close = '''                                .setNegativeButton("취소", null)
+                                .show()
+                        } else {
+                            confirmAccountDeletion()
+                        }
+                    }
+                    .setNegativeButton("닫기", null)'''
+    if close not in a:
+        raise SystemExit("Compact account menu branch ending missing")
+    a = a.replace(close, new_close, 1)
 
 # Extend the existing Google sign-in result bridge for secure reauthentication before deletion.
 a = a.replace(
@@ -177,7 +193,7 @@ python - <<'PY'
 from pathlib import Path
 a = Path("app/src/main/java/com/earthunlock/app/MainActivity.kt").read_text(encoding="utf-8")
 m = Path("app/src/main/java/com/earthunlock/app/FirebaseBackupManager.kt").read_text(encoding="utf-8")
-assert "MY_EARTH_ACCOUNT_DELETE_BUTTON" in a
+assert "계정 및 클라우드 데이터 삭제" in a
 assert "private fun confirmAccountDeletion()" in a
 assert "private fun performAccountDeletion()" in a
 assert "fun deleteAccountAndCloudData" in m
