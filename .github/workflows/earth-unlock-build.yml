@@ -199,7 +199,7 @@ jobs:
             echo "Unexpected background location permission in manifest"
             exit 1
           fi
-          if grep -q 'android:exported="true"' "$MANIFEST" | grep -q 'LocationTrackingService'; then
+          if grep -A4 -B2 'LocationTrackingService' "$MANIFEST" | grep -q 'android:exported="true"'; then
             echo "Location service must not be exported"
             exit 1
           fi
