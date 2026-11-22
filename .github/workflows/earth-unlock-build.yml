@@ -181,6 +181,11 @@ jobs:
         run: python patches/apply_v1027_account_deletion.py source
       - name: Apply v0.10.28 MY EARTH OpenStreetMap User-Agent
         run: python patches/apply_v1028_osm_user_agent.py source
+      - name: Apply v0.10.29 account deletion menu index fix
+        run: python patches/apply_v1029_account_delete_menu_index.py source
+      - name: Verify Play release policy and account deletion flow
+        working-directory: source
+        run: python scripts/verify-play-release-policy.py
       - name: Verify Play release manifest and policy-critical configuration
         working-directory: source
         run: |
