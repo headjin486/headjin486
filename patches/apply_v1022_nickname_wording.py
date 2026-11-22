@@ -49,3 +49,10 @@ grep -F 'versionName = "0.10.22"' app/build.gradle.kts >/dev/null
 verify.write_text(v, encoding="utf-8")
 
 print("MY EARTH v0.10.22 nickname wording updated in all matching Android resources: " + repr(counts))
+
+# Chain the next compatible incremental patch through the existing CI step.
+import subprocess
+subprocess.run(
+    [sys.executable, str(root.parent / "patches/apply_v1023_account_backup_status.py"), str(root)],
+    check=True,
+)
