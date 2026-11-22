@@ -12,6 +12,14 @@ start = a.find("    private fun requestAndStart() {")
 end = a.find("    private fun openAppSettings() {", start)
 if start < 0 or end < 0:
     raise SystemExit("Could not locate location permission flow; refusing unsafe rewrite")
+# v0.9.6 inserts the badge collection method immediately before openAppSettings.
+badge_start = a.find("    private fun showBadges() {", start, end)
+badge_method = ""
+if badge_start >= 0:
+    badge_end = a.find("    private fun openAppSettings() {", badge_start)
+    if badge_end < 0:
+        raise SystemExit("Could not preserve badge collection method")
+    badge_method = a[badge_start:badge_end]
 
 replacement = r'''    private fun requestAndStart() {
         val preferences = getSharedPreferences("my_earth_privacy", MODE_PRIVATE)
@@ -76,16 +84,17 @@ replacement = r'''    private fun requestAndStart() {
         }
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
+'''
+a = a[:start] + replacement + badge_method + a[end:]
+# Keep the pre-existing permission callback, but start tracking only after permission is granted.
+cb_start = a.find("    override fun onRequestPermissionsResult(")
+cb_end = a.find("    private fun refreshFog()", cb_start)
+if cb_start < 0 or cb_end < 0:
+    raise SystemExit("Could not locate existing permission callback")
+callback = r'''    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode != this.requestCode) return
-        val fineGranted = ContextCompat.checkSelfPermission(
-            this, Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
+        val fineGranted = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
         if (fineGranted) {
             startLocationTrackingService()
         } else {
@@ -99,7 +108,7 @@ replacement = r'''    private fun requestAndStart() {
     }
 
 '''
-a = a[:start] + replacement + a[end:]
+a = a[:cb_start] + callback + a[cb_end:]
 if a.find("위치 정보 수집 및 이용 안내") > a.find("ActivityCompat.requestPermissions(this, permissions, requestCode)"):
     raise SystemExit("Disclosure ordering check failed")
 activity.write_text(a, encoding="utf-8")
