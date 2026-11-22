@@ -177,6 +177,8 @@ jobs:
         run: python patches/apply_v1022_nickname_wording.py source
       - name: Apply v0.10.26 Play policy location disclosure and privacy notice
         run: python patches/apply_v1026_play_policy_disclosure.py source
+      - name: Apply v0.10.27 Firebase account and cloud data deletion
+        run: python patches/apply_v1027_account_deletion.py source
       - name: Run static lifecycle checks
         working-directory: source
         run: |
