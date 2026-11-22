@@ -33,7 +33,7 @@ if 'versionCode = 87' not in v or 'versionName = "0.10.34"' not in v:
     raise SystemExit("Expected v0.10.34 verifier assertions")
 v = v.replace('versionCode = 87', 'versionCode = 88', 1)
 v = v.replace('versionName = "0.10.34"', 'versionName = "0.10.35"', 1)
-anchor = 'assert "else if (which == 3)" in activity'
+anchor = 'assert "else if (which == 2)" in activity and "else if (which == 3)" in activity'
 if anchor not in v:
     raise SystemExit("Account menu branch verifier anchor missing")
 v = v.replace(anchor, anchor + '''
