@@ -1,15 +1,15 @@
 # MY EARTH Data Safety 사전 점검표
 
 최종 점검일: 2026-11-22
-대상 빌드: v0.10.33 / versionCode 86
+대상 빌드: v0.10.34 / versionCode 87
 패키지: com.earthunlock.app
-AAB SHA-256: fdbb4762795dfa6e9d1575ca0a46da2e39bfc1f5ee739fcc139c9ccadc0e095d
+AAB SHA-256: 24a15dbb696c35f13bf0e3b7fc3de659e02a0f7fc6ca03d5451b7673eb26999e
 
 > 내부 검토 문서이며 Play Console 설문 최종 답변이 아니다. 운영 Firebase의 실제 계정·네트워크·삭제 리허설 전에는 확정 제출하지 않는다.
 
-## 1. 현재 빌드에서 확인된 사항
+APK SHA-256: f96aca271d95f1c58adf711a696fef4674aab7f21e7628f11395121f37e84ab8\n\n## 1. 현재 빌드에서 확인된 사항
 
-- GitHub Actions 실행 #45029892659 성공.
+- GitHub Actions 실행 #45031583947 성공.\n- 계정별 백업 동의 수정(v0.10.34) 포함.
 - versionName 0.10.33 / versionCode 86 / compileSdk 36 / targetSdk 36.
 - APK 서명 검증과 기존 업로드 인증서 지문 일치 확인 통과.
 - AAB 생성 및 로컬 JAR 서명 검증 통과.
