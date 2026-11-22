@@ -59,6 +59,17 @@ if anchor not in v:
 v = v.replace(anchor, anchor + '''
 assert "FirebaseBackupManager.setEnabled(this@MainActivity, false)" in activity
 assert "클라우드 자동 백업은 중지했습니다" in activity
+# Explicit cloud-backup consent must remain separate from Google account linking.
+consent_start = activity.index("private fun confirmCloudBackupOptIn()")
+consent_end = activity.index("private fun startGoogleRecoveryFlow(", consent_start)
+consent = activity[consent_start:consent_end]
+assert '.setPositiveButton("동의하고 백업 켜기")' in consent
+assert consent.count("FirebaseBackupManager.setEnabled(this, true)") == 1
+google_start = activity.index("override fun onActivityResult(")
+google_end = activity.index("private fun confirmAccountDeletion()", google_start)
+google_flow = activity[google_start:google_end]
+assert "FirebaseBackupManager.setEnabled(this, true)" not in google_flow
+assert google_flow.count("confirmCloudBackupOptIn()") >= 3
 ''', 1)
 verifier.write_text(v, encoding="utf-8")
 print("v0.10.33 replaces the account deletion handler and disables automatic cloud backup after any deletion failure.")
