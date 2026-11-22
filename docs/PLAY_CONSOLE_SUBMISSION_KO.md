@@ -109,7 +109,7 @@ Data safety 입력 전 확인해야 할 질문:
 ## 9. v0.10.28 최종 빌드 확인 (2026-11-22)
 
 - GitHub Actions run: https://github.com/headjin486/headjin486/actions/runs/45009972849
-- 결과: 정적 수명주기 검사, 단위 테스트, Release APK 빌드, APK 서명 검증, AAB 생성 및 업로드 단계 모두 성공.
+- 결과: Play 출시 설정 검사, 단위 테스트, Release APK 빌드, APK 서명 검증, AAB 생성 및 업로드 단계 성공. 다만 `scripts/verify-service-lifecycle.sh` 파일이 소스 패키지에 없어 기존 정적 수명주기 스크립트 검사는 실행되지 않았음(워크플로 로그에서 경고 확인). 따라서 수명주기 동작은 실기기에서 별도 검증해야 함.
 - versionName: 0.10.28 / versionCode: 81 / applicationId: com.earthunlock.app
 - AAB SHA-256: `f64326c87f920ef7b035d5e3da634ee1e01e4e95514ea70f9cb91ac2074d6b5e`
 - APK SHA-256: `dc8b1f57b8ef82e19f6e961ef838dcc71f0928845232f329da20c29e4ddc4df4`
