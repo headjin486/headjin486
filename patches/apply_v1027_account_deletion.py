@@ -22,11 +22,19 @@ if "계정 및 클라우드 데이터 삭제" not in a:
         raise SystemExit("Google account menu branch anchor not found")
     a = a[:branch_start] + a[branch_start:].replace("} else {", "} else if (which == 1) {", 1)
 
-    menu_close = '\n                    }\n                    .setNegativeButton("닫기", null)'
+    # Convert the existing Google-account branch into the middle branch of the
+    # if/else-if/else chain. The final else must be inside setItems' lambda.
+    menu_close = '\n                        }\n                    }\n                    .setNegativeButton("닫기", null)'
     close_at = a.find(menu_close, google_title)
     if close_at < 0:
-        raise SystemExit("Compact account menu lambda ending not found")
-    a = a[:close_at] + '\n                        } else {\n                            confirmAccountDeletion()\n                        }' + a[close_at:]
+        raise SystemExit("Google account branch ending not found")
+    replacement = (
+        '\n                        } else {\n'
+        '                            confirmAccountDeletion()\n'
+        '                        }\n'
+        '                    }'
+    )
+    a = a[:close_at] + replacement + a[close_at + len(menu_close):]
 
 # Extend the existing Google sign-in result bridge for secure reauthentication before deletion.
 a = a.replace(
