@@ -179,6 +179,10 @@ jobs:
         run: python patches/apply_v1026_play_policy_disclosure.py source
       - name: Apply v0.10.27 Firebase account and cloud data deletion
         run: python patches/apply_v1027_account_deletion.py source
+      - name: Inspect account menu Kotlin source
+        working-directory: source
+        run: |
+          nl -ba app/src/main/java/com/earthunlock/app/MainActivity.kt | sed -n '365,400p'
       - name: Run static lifecycle checks
         working-directory: source
         run: |
