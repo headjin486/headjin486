@@ -191,6 +191,8 @@ jobs:
         run: python patches/apply_v1032_account_deletion_recovery.py source
       - name: Apply v0.10.33 stop cloud backup after deletion failure
         run: python patches/apply_v1033_stop_backup_after_delete_failure.py source
+      - name: Apply v0.10.34 account-scoped cloud backup consent
+        run: python patches/apply_v1034_account_scoped_backup_consent.py source
       - name: Verify Play release policy and account deletion flow
         working-directory: source
         run: python scripts/verify-play-release-policy.py
@@ -204,8 +206,8 @@ jobs:
           grep -F 'applicationId = "com.earthunlock.app"' "$GRADLE"
           grep -F 'compileSdk = 36' "$GRADLE"
           grep -F 'targetSdk = 36' "$GRADLE"
-          grep -F 'versionCode = 86' "$GRADLE"
-          grep -F 'versionName = "0.10.33"' "$GRADLE"
+          grep -F 'versionCode = 87' "$GRADLE"
+          grep -F 'versionName = "0.10.34"' "$GRADLE"
           grep -F 'android:foregroundServiceType="location"' "$MANIFEST"
           grep -F 'android:usesCleartextTraffic="false"' "$MANIFEST"
           if grep -q 'ACCESS_BACKGROUND_LOCATION' "$MANIFEST"; then
