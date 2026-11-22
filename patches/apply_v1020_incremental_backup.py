@@ -109,6 +109,15 @@ if 'versionCode = 72' not in (root / "app/build.gradle.kts").read_text(encoding=
     raise SystemExit("Unexpected app version; expected v0.10.19 before incremental-backup patch")
 if 'delta_' not in s2 or 'missingCells' not in s2:
     raise SystemExit("Incremental backup implementation verification failed")
+old_interval = "private const val MIN_SYNC_INTERVAL_MS = 5 * 60 * 1000L"
+if old_interval not in s2:
+    raise SystemExit("Expected automatic-sync interval not found")
+s2 = s2.replace(
+    old_interval,
+    "private const val MIN_SYNC_INTERVAL_MS = 6 * 60 * 60 * 1000L",
+    1,
+)
+
 manager.write_text(s2, encoding="utf-8")
 
 gradle = root / "app/build.gradle.kts"
