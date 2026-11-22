@@ -8,7 +8,7 @@ manager = pkg / "FirebaseBackupManager.kt"
 s = manager.read_text(encoding="utf-8")
 
 pattern = re.compile(
-    r"    private fun syncForUid\\(.*?(?=    private fun encode\\()",
+    r"    private fun syncForUid\(.*?(?=    private fun encode\()",
     re.S,
 )
 replacement = r'''    /**
