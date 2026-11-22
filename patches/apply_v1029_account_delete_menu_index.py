@@ -26,7 +26,7 @@ manager = Path("app/src/main/java/com/earthunlock/app/FirebaseBackupManager.kt")
 gradle = Path("app/build.gradle.kts").read_text(encoding="utf-8")
 manifest = Path("app/src/main/AndroidManifest.xml").read_text(encoding="utf-8")
 
-menu = re.search(r"setItems\\(arrayOf\\((.*?)\\)\\)\\s*\\{\\s*_,\\s*which\\s*->", activity, re.S)
+menu = re.search(r"setItems\(arrayOf\((.*?)\)\)\s*\{\s*_,\s*which\s*->", activity, re.S)
 assert menu, "Account menu array not found"
 entries = re.findall(r'"([^"]+)"', menu.group(1))
 assert entries == [
@@ -37,8 +37,8 @@ assert entries == [
 ], f"Unexpected account menu entries/order: {entries}"
 assert "if (which == 0)" in activity
 assert "else if (which == 1)" in activity
-assert "if (which == 3) {\\n                            confirmAccountDeletion()" in activity
-assert "if (which == 2) {\\n                            confirmAccountDeletion()" not in activity
+assert "if (which == 3) {\n                            confirmAccountDeletion()" in activity
+assert "if (which == 2) {\n                            confirmAccountDeletion()" not in activity
 
 assert "private fun confirmAccountDeletion()" in activity
 assert "private fun performAccountDeletion()" in activity
