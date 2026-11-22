@@ -109,7 +109,7 @@ policy = pkg / "PrivacyPolicyActivity.kt"
 p = policy.read_text(encoding="utf-8")
 policy_text = r'''        private val POLICY_TEXT = """
 시행일: 2026-11-22
-운영자 및 개인정보 문의: [출시 전 실제 운영자명과 공개 문의 이메일 입력]
+운영자 및 개인정보 문의: MY EARTH 운영자 · headjin486@gmail.com
 
 1. 처리하는 정보
 자동 탐험을 사용자가 직접 시작하고 위치 이용 안내에 동의한 동안 GPS 위도·경도, 위치 정확도, 측정 시각을 처리합니다. 현재 위치 표시, 지나간 지도 영역 해금, 이동 기록 및 탐험 통계 계산에 사용합니다. 사용자가 Google 계정을 연결하면 Firebase Authentication이 계정 식별 정보(예: UID 및 Google 계정 이메일)를 처리할 수 있습니다.
