@@ -199,6 +199,8 @@ jobs:
         run: python patches/apply_v1036_live_badge_count.py source
       - name: Apply v0.10.37 cloud backup settings branch fix
         run: python patches/apply_v1037_cloud_backup_menu_branch.py source
+      - name: Apply v0.10.38 deferred account menu dialog handoff
+        run: python patches/apply_v1038_deferred_account_menu_action.py source
       - name: Upload fully patched source for diagnostics
         uses: actions/upload-artifact@v4
         with:
@@ -219,8 +221,8 @@ jobs:
           grep -F 'applicationId = "com.earthunlock.app"' "$GRADLE"
           grep -F 'compileSdk = 36' "$GRADLE"
           grep -F 'targetSdk = 36' "$GRADLE"
-          grep -F 'versionCode = 90' "$GRADLE"
-          grep -F 'versionName = "0.10.37"' "$GRADLE"
+          grep -F 'versionCode = 91' "$GRADLE"
+          grep -F 'versionName = "0.10.38"' "$GRADLE"
           grep -F 'android:foregroundServiceType="location"' "$MANIFEST"
           grep -F 'android:usesCleartextTraffic="false"' "$MANIFEST"
           if grep -q 'ACCESS_BACKGROUND_LOCATION' "$MANIFEST"; then
