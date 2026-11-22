@@ -169,6 +169,8 @@ PY
 grep -F 'versionCode = 79' app/build.gradle.kts >/dev/null
 grep -F 'versionName = "0.10.26"' app/build.gradle.kts >/dev/null
 '''
+v = v.replace("versionCode = 78", "versionCode = 79")
+v = v.replace('versionName = "0.10.25"', 'versionName = "0.10.26"')
 verify.write_text(v, encoding="utf-8")
 
 print("MY EARTH v0.10.26: moved prominent location disclosure ahead of Android permission request and updated privacy disclosure for opt-in Firebase cell backup.")
