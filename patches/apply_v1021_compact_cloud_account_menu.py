@@ -36,10 +36,55 @@ replacement = """        summaryRow.addView(countText, LinearLayout.LayoutParams
             contentDescription = "클라우드 백업 및 Google 계정 관리"
             setOnClickListener {
                 AlertDialog.Builder(this@MainActivity)
-                    .setTitle("클라우드 백업 및 계정")
+                    .setTitle("백업 및 계정 관리")
                     .setItems(arrayOf("클라우드 백업 설정 / 지금 백업", "Google 계정 연결 / 기기 변경 복원")) { _, which ->
-                        if (which == 0) cloudBackupButton.performClick()
-                        else googleRecoveryButton.performClick()
+                        if (which == 0) {
+                            if (FirebaseBackupManager.isEnabled(this@MainActivity)) {
+                                AlertDialog.Builder(this@MainActivity)
+                                    .setTitle("클라우드 백업")
+                                    .setMessage("해금된 지도 셀만 Firebase에 백업합니다. GPS 좌표와 시간순 이동 경로는 전송하지 않습니다.")
+                                    .setNegativeButton("백업 끄기") { _, _ ->
+                                        FirebaseBackupManager.setEnabled(this@MainActivity, false)
+                                        text = "☁ 백업 · 계정"
+                                    }
+                                    .setPositiveButton("지금 백업") { _, _ ->
+                                        FirebaseBackupManager.requestSyncIfEnabled(this@MainActivity, store, true) { message ->
+                                            runOnUiThread {
+                                                Toast.makeText(this@MainActivity, message, Toast.LENGTH_LONG).show()
+                                            }
+                                        }
+                                    }
+                                    .setNeutralButton("닫기", null)
+                                    .show()
+                            } else {
+                                AlertDialog.Builder(this@MainActivity)
+                                    .setTitle("탐험 기록 클라우드 백업")
+                                    .setMessage("동의하면 해금된 지도 셀 식별자만 Firebase에 백업됩니다. GPS 좌표, 이동 경로, 위치 기록과 시간 정보는 업로드하지 않습니다. 앱 데이터 삭제나 기기 변경 전에 Google 계정 복구 기능을 연결해야 합니다.")
+                                    .setNegativeButton("나중에", null)
+                                    .setPositiveButton("동의하고 켜기") { _, _ ->
+                                        FirebaseBackupManager.setEnabled(this@MainActivity, true)
+                                        text = "☁ 백업 · 계정"
+                                        FirebaseBackupManager.requestSyncIfEnabled(this@MainActivity, store, true) { message ->
+                                            runOnUiThread {
+                                                Toast.makeText(this@MainActivity, message, Toast.LENGTH_LONG).show()
+                                            }
+                                        }
+                                    }
+                                    .show()
+                            }
+                        } else {
+                            AlertDialog.Builder(this@MainActivity)
+                                .setTitle("Google 계정으로 기록 보호")
+                                .setMessage("현재 휴대폰에서는 익명 계정을 Google 계정에 연결해 기기 변경에 대비할 수 있습니다. 새 휴대폰에서는 기존 Google 계정으로 로그인해 클라우드 기록을 복원할 수 있습니다.")
+                                .setPositiveButton("현재 기록을 Google에 연결") { _, _ ->
+                                    startGoogleRecoveryFlow(restoreExisting = false)
+                                }
+                                .setNeutralButton("기존 Google 계정으로 복원") { _, _ ->
+                                    startGoogleRecoveryFlow(restoreExisting = true)
+                                }
+                                .setNegativeButton("취소", null)
+                                .show()
+                        }
                     }
                     .setNegativeButton("닫기", null)
                     .show()
