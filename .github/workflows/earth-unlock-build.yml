@@ -13,7 +13,7 @@ on:
 permissions:
   contents: read
 
-# MY EARTH v0.10.9: adaptive launcher icon safe-zone correction
+# MY EARTH v0.10.19: cloud backup Kotlin fallback correction
 jobs:
   build:
     runs-on: ubuntu-latest
