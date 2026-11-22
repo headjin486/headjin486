@@ -23,6 +23,29 @@ APK SHA-256: f96aca271d95f1c58adf711a696fef4674aab7f21e7628f11395121f37e84ab8\n\
 - 클라우드 백업 payload는 해금된 5m 격자 셀 ID만 포함하며 원본 GPS 좌표·시간순 경로·GPS 측정 시각은 포함하지 않는다.
 - Firebase UID별 Firestore 경로는 소유자 인증을 요구하고 허용 필드를 제한한다.
 
+## 1-1. v0.10.34 AAB 정적 SDK 구성 확인 (2026-11-22)
+
+Play Store AAB의 `BUNDLE-METADATA/com.android.tools.build.libraries/dependencies.pb` 및 DEX 문자열을 직접 확인했다.
+
+확인된 구성:
+- Firebase Authentication
+- Firebase Cloud Firestore
+- Google Play services Auth / Identity 관련 구성
+- Google Play services Location
+- osmdroid 지도 라이브러리
+- Google Play Core 관련 라이브러리
+- Firebase App Check interop 관련 클래스/의존성
+
+정적 구성에서 확인되지 않은 SDK:
+- Google Mobile Ads / AdMob
+- Firebase Analytics
+- Firebase Crashlytics
+
+주의:
+- App Check interop 클래스가 포함된 사실만으로 App Check가 실제 초기화·활성화됐다고 판단하지 않는다.
+- SDK 의존성 목록만으로 모든 네트워크 전송이나 Google Play Data Safety 답변을 확정하지 않는다. 운영 Firebase 로그인·백업 동의 전후 네트워크 관찰 및 실제 SDK 초기화 경로 검토가 남아 있다.
+- Google Play Core 관련 구성은 광고 SDK와 다르다. 앱 업데이트/리뷰 관련 라이브러리 존재 여부를 광고 수집으로 오인하지 않는다.
+
 ## 2. Play Console 데이터 유형 후보
 
 | 데이터 유형 | 후보 수집 여부 | 선택 여부 | 목적 | 근거 및 주의 |
