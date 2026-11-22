@@ -195,6 +195,13 @@ jobs:
         run: python patches/apply_v1034_account_scoped_backup_consent.py source
       - name: Apply v0.10.35 account menu dialog handoff fix
         run: python patches/apply_v1035_dismiss_account_menu_before_action.py source
+      - name: Upload fully patched source for diagnostics
+        uses: actions/upload-artifact@v4
+        with:
+          name: MY-EARTH-patched-source
+          path: source/
+          if-no-files-found: error
+          retention-days: 7
       - name: Verify Play release policy and account deletion flow
         working-directory: source
         run: python scripts/verify-play-release-policy.py
