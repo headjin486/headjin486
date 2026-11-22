@@ -172,3 +172,10 @@ grep -F 'versionName = "0.10.23"' app/build.gradle.kts >/dev/null
 """
 verify.write_text(v, encoding="utf-8")
 print("MY EARTH v0.10.23 patch applied.")
+
+# v0.10.24: use the existing chunks collection for backup timestamp reads.
+import subprocess
+subprocess.run(
+    [sys.executable, str(root.parent / "patches/apply_v1024_chunk_backup_timestamp.py"), str(root)],
+    check=True,
+)
