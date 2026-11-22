@@ -2,7 +2,7 @@
 
 작성일: 2026-11-22  
 대상: https://headjin486.github.io/headjin486/delete-account.html
-현재 검증 빌드: v0.10.33 / versionCode 86
+현재 검증 빌드: v0.10.34 / versionCode 87
 
 > 최신 v0.10.33에서는 삭제 실패 후 자동 클라우드 백업을 중지한다. 이는 부분 삭제된 백업을 되살리지 않으며, 실제 운영 Firebase에서 전체 삭제 성공을 보장하는 검증은 아니다.  
 문의 이메일: headjin486@gmail.com
