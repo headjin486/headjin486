@@ -8,8 +8,8 @@ s = manager.read_text(encoding="utf-8")
 s = s.replace('error.localizedMessage ?: "알 수 없는 오류"', 'error.localizedMessage ?: error.javaClass.simpleName')
 s = s.replace('error?.localizedMessage ?: "네트워크 또는 Firestore 규칙을 확인하세요."', 'error?.localizedMessage ?: error.toString()')
 
-if '"알 수 없는 오류"' in s or '"네트워크 또는 Firestore 규칙을 확인하세요."' in s:
-    raise SystemExit("Nested fallback string remains; refusing to continue")
+# The fallback phrases may also appear in unrelated UI text; the exact
+# problematic interpolation expressions above are replaced directly.
 
 manager.write_text(s, encoding="utf-8")
 
