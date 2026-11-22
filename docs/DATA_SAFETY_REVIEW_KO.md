@@ -1,97 +1,75 @@
-# MY EARTH Data Safety 사전 점검표 (내부 초안)
+# MY EARTH Data Safety 사전 점검표
 
-작성일: 2026-11-22  
-대상 빌드: v0.10.31 / versionCode 84 (정책·서명 빌드 검증 및 실기기 업데이트 확인)  
-AAB SHA-256: f64326c87f920ef7b035d5e3da634ee1e01e4e95514ea70f9cb91ac2074d6b5e
+최종 점검일: 2026-11-22
+대상 빌드: v0.10.33 / versionCode 86
+패키지: com.earthunlock.app
+AAB SHA-256: fdbb4762795dfa6e9d1575ca0a46da2e39bfc1f5ee739fcc139c9ccadc0e095d
 
-> 이 문서는 Play Console 설문을 대신하는 최종 답변이 아니다. 실제 Firebase Auth 프로필 필드, 네트워크 트래픽, 지도 타일 제공자 및 계정 삭제 운영을 확인한 후 확정한다.
+> 내부 검토 문서이며 Play Console 설문 최종 답변이 아니다. 운영 Firebase의 실제 계정·네트워크·삭제 리허설 전에는 확정 제출하지 않는다.
 
-## 1. AAB에서 확인한 항목 (v0.10.31)
+## 1. 현재 빌드에서 확인된 사항
 
-- 최신 v0.10.31 AAB 빌드 #251: GitHub Actions 성공. APK 서명 검증 및 AAB 검증 단계 통과.
-- versionName 0.10.31 / versionCode 84.
-- 실기기 업데이트 설치 후 기존 탐험 기록 유지 확인.
-- 계정 메뉴의 계정 삭제 항목이 정상적으로 열리는 것까지 실기기 확인. 실제 삭제 버튼 실행 및 Firebase Auth·Firestore 데이터 삭제 결과는 미검증.
+- GitHub Actions 실행 #45029892659 성공.
+- versionName 0.10.33 / versionCode 86 / compileSdk 36 / targetSdk 36.
+- APK 서명 검증과 기존 업로드 인증서 지문 일치 확인 통과.
+- AAB 생성 및 로컬 JAR 서명 검증 통과.
+- 패키지 ID `com.earthunlock.app`.
+- Manifest에서 ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION, FOREGROUND_SERVICE, FOREGROUND_SERVICE_LOCATION 확인.
+- ACCESS_BACKGROUND_LOCATION 미선언, cleartext traffic 비활성화, 위치 포그라운드 서비스 비공개(exported=false) 확인.
+- Firebase Authentication, Firebase Cloud Firestore, osmdroid, Google Play services Location 사용.
+- AdMob 및 Firebase Analytics 의존성은 이전 AAB 메타데이터 점검에서 확인되지 않았으나, 최신 AAB 전체 SDK/네트워크 트래픽 분석 전까지 최종 선언으로 단정하지 않는다.
+- 표준 지도 타일 엔드포인트는 `https://tile.openstreetmap.org/`이며 User-Agent에 MY EARTH, 패키지, 문의 이메일을 식별하도록 구성.
+- 앱의 백업 동의는 Google 계정 연결과 별도 단계다. Google 계정 연결만으로 자동 백업 동의를 대신하지 않는다.
+- 클라우드 백업 payload는 해금된 5m 격자 셀 ID만 포함하며 원본 GPS 좌표·시간순 경로·GPS 측정 시각은 포함하지 않는다.
+- Firebase UID별 Firestore 경로는 소유자 인증을 요구하고 허용 필드를 제한한다.
 
-- AAB 패키지명: com.earthunlock.app
-- AAB 버전: 0.10.28 / versionCode 81
-- 빌드 산출물: app-release.aab
-- AAB JAR 서명 검증: jarsigner에서 서명 검증 성공. 업로드 키 인증서는 자체 서명이며 공개 CA 체인으로 검증되는 인증서가 아님.
-- 의존성 메타데이터에서 확인: Firebase Authentication, Firebase Firestore, osmdroid, Google Play services Location
-- 의존성 메타데이터에서 AdMob 및 Firebase Analytics SDK는 확인되지 않음. 이는 광고·분석 SDK가 없다는 강한 단서이나, 최종적으로 모든 모듈 및 네트워크 트래픽을 대조해야 함.
-- 소스 프로젝트의 Gradle 설정: compileSdk 36 / targetSdk 36 / minSdk 26
-- AAB의 manifest permission 문자열에서 확인: INTERNET, ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION, FOREGROUND_SERVICE, FOREGROUND_SERVICE_LOCATION
-- ACCESS_BACKGROUND_LOCATION은 v0.10.28 AAB manifest의 권한 문자열에서 확인되지 않음.
-- OSM 타일 엔드포인트: `https://tile.openstreetmap.org/`
-- DEX의 User-Agent: `MY EARTH/0.10.28 (Android; com.earthunlock.app; contact: headjin486@gmail.com)` 확인. 이전 `EarthExplorer/0.7.6` 문자열은 발견되지 않음.
-- LocationTrackingService는 location foreground service로 선언되어 있음.
+## 2. Play Console 데이터 유형 후보
 
-## 2. Data Safety 분류 후보
+| 데이터 유형 | 후보 수집 여부 | 선택 여부 | 목적 | 근거 및 주의 |
+|---|---|---|---|---|
+| 위치 - 정확한 위치 | 예 | 선택적 | 앱 기능, 백업/복원 | 백업 동의 시 5m 격자 셀 식별자가 Firebase로 전송됨. 원본 GPS 경로는 로컬 전용. 셀 좌표가 실제 위치를 좁게 특정할 수 있어 위치 데이터로 신고하는 보수적 분류 |
+| 개인 정보 - 이메일 주소 | 예(해당 시) | 선택적 | 계정 관리 | 이용자가 Google 계정을 연결하면 Firebase Auth가 Google 계정 이메일을 처리할 수 있음. 실제 운영 Auth 사용자 레코드 필드 확인 필요 |
+| 기기 또는 기타 ID - 사용자 ID | 예(해당 시) | 선택적 | 계정 관리, 백업/복원 | Firebase UID가 계정과 백업 문서를 연결. 실제 인증 시점과 Firebase 전송 내용을 확인할 것 |
+| 기기 또는 기타 ID - 기타 식별자/IP 관련 정보 | 미확정 | 미확정 | 지도 타일 요청 | OSM 타일 서버는 통상 네트워크 IP 및 요청 타일 정보를 볼 수 있음. Google Data Safety 분류 여부는 최신 SDK/트래픽과 해당 데이터 유형 정의를 대조한 뒤 결정 |
 
-| Play Console 데이터 유형 | 현재 파악 | 후보 목적 / 처리 |
-|---|---|---|
-| 위치 - 정확한 위치 | 클라우드 백업 시 5m 격자 셀 좌표가 Firebase Firestore로 전송됨. 원본 GPS 좌표·시간순 경로는 로컬 저장 | 앱 기능 / 선택형 지도 백업 |
-| 개인 정보 - 이메일 주소 | Google 계정 연결 시 Firebase Authentication이 이메일을 처리할 가능성이 높음. 실제 Firebase 사용자 레코드 확인 필요 | 계정 관리 |
-| 기기 또는 기타 ID - 사용자 ID | Firebase UID로 백업 문서와 계정을 연결 | 계정 관리 / 백업 복원 |
-| 개인 정보 - 이름(닉네임) | 앱 닉네임은 로컬 프로필에 저장되는 것으로 파악. 클라우드 전송 여부 확인 필요 | 로컬 표시 목적이라면 수집 아님 |
+로컬에만 저장되고 기기 밖으로 전송되지 않는 원본 GPS 경로, 탐험 통계, 닉네임은 Google Play의 '수집'으로 자동 분류하지 않는다. 다만 앱 내 개인정보 처리방침에는 로컬 처리 사실을 계속 공개한다.
 
-주의:
-- 원본 GPS 경로가 서버로 전송되지 않더라도 5m 셀 ID는 실제 위치를 매우 좁은 영역으로 특정할 수 있으므로 위치 데이터 수집으로 분류하는 방향이 안전하다.
-- 로컬에서만 처리되고 기기 밖으로 전송되지 않는 GPS 기록은 Google Data Safety의 '수집'과 구분한다.
-- Google Play는 SDK가 전송하는 데이터도 앱의 데이터 처리로 포함한다.
-- Firebase를 서비스 제공자로 사용하는 경우에도 해당 데이터 유형과 목적을 숨기지 않는다. 공유 여부는 Google의 service provider 예외 및 Firebase 계약/처리 관계를 대조한다.
+## 3. Play Console 설문에 대한 잠정 방향
 
-## 3. 설문 답변을 확정하기 전 반드시 확인할 것
+- 앱이 수집 또는 공유하는 데이터가 있는가: **예**로 진행하는 것이 안전하다.
+- 전송 중 암호화: Firebase 및 지도 타일 요청은 HTTPS/TLS 사용을 전제로 하나, 최신 AAB의 모든 네트워크 요청을 확인한 후 확정.
+- 계정/데이터 삭제 요청 수단: 인앱 계정 삭제 경로와 외부 이메일 요청 페이지가 존재한다. 다만 운영 Firebase 테스트 계정으로 전체 삭제 성공을 검증하지 못했으므로 최종 제출 전 리허설 필수.
+- Firebase는 데이터 처리 서비스 제공자로 분류할 수 있는지 Google의 service provider 정의 및 실제 계약·처리관계를 확인한다. 서비스 제공자 예외가 sharing 분류에 영향을 주더라도 collection 사실을 누락하지 않는다.
+- 데이터 유형별 사용 목적, 필수/선택, 보유기간은 앱 실제 흐름과 일치시킨다.
+- Play Console Data Safety는 SDK가 전송하는 데이터도 포함한다. 모든 SDK와 외부 수신자를 확인한다.
 
-1. Firebase Authentication 사용자 레코드에서 Google 연결 계정의 email, displayName, providerData 중 실제 저장되는 필드를 확인한다.
-2. Firebase UID가 사용자 계정과 연결되는 식별자이므로 사용자 ID 항목으로 신고한다.
-3. 클라우드 백업이 선택 동의 후에만 시작되는지, 거부 상태에서 Firestore 쓰기가 발생하지 않는지 확인한다.
-4. Firestore의 백업 문서와 updatedAt 이외에 추가 필드가 없는지 확인한다.
-5. 앱의 모든 네트워크 요청에서 OSM 타일 제공자와 Firebase 외 다른 수신자가 있는지 확인한다.
-6. 광고 SDK/Analytics SDK가 없다는 의존성 확인을 최종 AAB 전체 모듈과 실제 네트워크 관찰로 재확인한다.
-7. 데이터 암호화 전송, 계정 삭제, 백업 삭제, 보유기간을 실제 동작과 맞춘다.
+## 4. 아직 끝나지 않은 검증
 
-## 4. 지도 타일 제공자 주의사항
+1. 테스트 전용 Google 계정으로 실제 Firebase Auth 로그인·연결을 수행하고 email, displayName, providerData, UID 필드를 확인.
+2. 백업 동의 전/후 Firestore 쓰기와 네트워크 트래픽을 비교. 동의 거부 시 셀 데이터 쓰기가 없어야 함.
+3. Google 계정 연결만으로 백업이 켜지지 않는지 확인.
+4. 테스트 계정에서만 여러 백업 청크를 생성하고 앱 내 계정 삭제, Firestore 청크 삭제, Firebase Auth 삭제가 모두 완료되는지 확인.
+5. Google 재인증 취소/실패, 네트워크 실패, Auth 삭제 실패에서 부분 삭제와 사용자 안내를 확인.
+6. OSM 타일 요청과 Firebase 외의 외부 수신자 및 SDK 전송 데이터를 최신 AAB/실기기에서 확인.
+7. 개인정보 처리방침의 운영자 표시, 보유·삭제, 외부 서비스 안내를 실제 운영 방식과 대조.
+8. 삭제 이메일을 실제 수신할 수 있는지, 요청 접수·소유 확인·삭제·완료 회신 절차를 테스트.
 
-현재 앱은 osmdroid를 사용하고 있으며, 공개 안내문은 OpenStreetMap 기반 타일을 언급한다. 그러나 실제 빌드의 타일 URL과 User-Agent 설정을 확인해야 한다.
+## 5. 계정 삭제 위험
 
-OpenStreetMap 표준 타일 서버(tile.openstreetmap.org)를 사용하는 경우:
-- 타일 요청은 서버/CDN에 도달하며 IP 주소와 요청 타일 정보 등 네트워크 운영 데이터가 처리될 수 있다.
-- OSMF 개인정보처리방침과 타일 사용 정책을 개인정보처리방침에 반영한다.
-- 타일 사용 정책은 서비스 용량, 식별 가능한 User-Agent, 캐시 및 사전 다운로드 금지 조건을 둔다.
-- OSMF는 자체 표준 타일 서버를 상업용 타일 서비스로 보장하지 않으며, 상업 서비스의 접근을 중단할 수 있다고 명시한다.
-- MY EARTH가 향후 광고 등 수익화할 경우, 공개 OSM 표준 타일을 계속 사용하는 것이 적절한지 재검토하고 상업 이용 조건이 명확한 타일 제공자로 전환하는 것이 바람직하다.
+- Firebase Emulator 기반 규칙 테스트 4건 및 계정 삭제 통합 테스트 2건은 통과했으나, 이는 운영 Firebase 프로젝트 검증이 아니다.
+- 현재 삭제 구현은 해당 UID의 Firestore 청크를 먼저 삭제하고 Auth 사용자를 삭제한다. Auth 삭제가 실패하면 백업은 이미 삭제됐지만 계정은 남는 부분 실패가 가능하다.
+- v0.10.33은 삭제 실패 후 자동 백업을 중지하고 사용자에게 실패 상태를 알린다. 이미 삭제된 백업을 복원하지는 않는다.
+- 익명 계정의 오래된 세션에서 최근 로그인 요구가 발생할 수 있다. 익명 계정은 Google 재인증을 할 수 없으므로 운영 Firebase 테스트 전까지 완전한 셀프서비스 삭제를 보장한다고 표현하지 않는다.
+- 실제 사용자 계정이나 실제 탐험 데이터로 삭제 테스트하지 않는다.
 
-참고:
-- https://operations.osmfoundation.org/policies/tiles/
-- https://osmfoundation.org/wiki/Privacy_Policy
+## 6. 외부 서비스 / 타일 서버
 
-## 5. 계정 삭제 상태 (v0.10.31)
+- Firebase Authentication: 익명 인증 및 선택적 Google 계정 연결.
+- Firebase Cloud Firestore: 선택 동의 후 해금 지도 셀 백업.
+- OpenStreetMap 표준 타일 서버: 지도 타일 제공. 요청 IP 및 요청 타일 영역 등 네트워크 운영정보가 처리될 수 있다.
+- OSM 표준 타일 서버는 상업용 SLA를 보장하는 전용 타일 호스팅 상품이 아니다. 향후 광고 등 수익화 전에는 상업적 이용 조건이 명확한 타일 제공자로 전환할지 검토한다.
+- 참고: https://operations.osmfoundation.org/policies/tiles/ 및 https://osmfoundation.org/wiki/Privacy_Policy
 
-- v0.10.31에서 계정 메뉴 분기를 상호 배타적인 if/else-if 구조로 수정했다. 계정 삭제 항목 선택 시 상태 안내창이 중복으로 뜨던 문제를 수정했다.
-- 실기기에서 계정 삭제 항목이 정상적으로 열리는 것까지 확인했다. 실제 영구 삭제 실행은 아직 하지 않았다.
-- Firebase Auth 계정 삭제 전에 해당 UID의 Firestore `exploration_backups/{UID}/chunks` 문서를 삭제하고, 모든 청크 삭제 성공 후 Auth 사용자를 삭제하도록 구현되어 있다.
-- Google 계정은 삭제 직전 Google 재인증 흐름을 거친다. 익명 계정의 장기 세션/재인증 조건 및 전체 삭제 성공 여부는 테스트 계정으로 검증해야 한다.
-- 실제 Firebase Auth 계정 및 Firestore 백업 청크 삭제 테스트는 아직 완료되지 않았다. 실제 사용자 계정/데이터는 테스트에 사용하지 않는다.
-- 로컬 GPS 기록 및 지도 데이터는 별도 보존된다.
-- 외부 삭제 경로는 이메일 접수 방식이며 자동 삭제가 아니다.
-- 이메일 요청의 소유자 확인, 처리 담당자, 처리 기한, 삭제 확인 및 회신을 운영자가 실제로 수행할 절차를 정하고 테스트해야 한다.
+## 7. 출시 판단
 
-## 6. 최종 확정 체크리스트
-
-- [ ] Firebase Auth 사용자 레코드의 실제 필드 확인
-- [ ] 클라우드 백업 거부/동의 시 Firestore 트래픽 비교
-- [ ] 타일 URL 및 User-Agent 실제 값 확인
-- [ ] OSM 요청에 전달되는 네트워크 데이터 확인
-- [ ] 모든 AAB SDK 및 외부 수신자 검증
-- [ ] Data Safety의 수집/공유/선택 여부/목적 확정
-- [ ] 계정 삭제 이메일 처리 운영자·기한·절차 확정 및 테스트
-- [ ] 개인정보처리방침의 타일 제공자, Firebase, 보유·삭제 설명 업데이트
-
-
-## 7. v0.10.31 기준 재확인 메모
-
-- 이 문서는 v0.10.31 AAB를 기준으로 갱신했지만 Data Safety 최종 설문을 확정한 것은 아니다.
-- AAB 정적 분석만으로는 실제 네트워크 전송 여부, Firebase Auth 프로필 필드, Firestore 백업 거부 상태의 쓰기 여부를 확정할 수 없다.
-- 실기기에서 업데이트 후 탐험 기록 유지 및 계정 삭제 메뉴 진입을 확인했다. 선택형 백업 동의/거부, Google 계정 연결, 실제 계정 삭제는 테스트 계정으로 별도 검증한 뒤 체크리스트를 완료한다.
-- 광고 및 분석 SDK는 AAB 의존성 메타데이터에서 확인되지 않았으나, 전체 SDK 및 실제 트래픽 대조 전까지 최종 신고 문구로 단정하지 않는다.
+현재 Data Safety는 **초안 상태**다. 최신 AAB 빌드와 서명 검증은 통과했지만, 실제 Firebase 계정 필드, 선택 동의 전후 트래픽, OSM 외부 요청, 운영 계정 삭제, 운영자 처리 절차가 검증되지 않았다. 위 항목이 끝나기 전 Play Console 제출용 답변으로 확정하지 않는다.
