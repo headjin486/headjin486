@@ -22,7 +22,7 @@ if "계정 및 클라우드 데이터 삭제" not in a:
         raise SystemExit("Google account menu branch anchor not found")
     a = a[:branch_start] + a[branch_start:].replace("} else {", "} else if (which == 1) {", 1)
 
-    menu_close = '\\n                    }\\n                    .setNegativeButton("닫기", null)'
+    menu_close = '\n                    }\n                    .setNegativeButton("닫기", null)'
     close_at = a.find(menu_close, google_title)
     if close_at < 0:
         raise SystemExit("Compact account menu lambda ending not found")
