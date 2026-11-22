@@ -1,25 +1,32 @@
 from pathlib import Path
-import re, sys
+import sys
 
 root = Path(sys.argv[1])
 res = root / "app/src/main/res"
 
-def update_string(relative, key, value):
-    path = res / relative
-    xml = path.read_text(encoding="utf-8")
-    pattern = re.compile(r'(<string\\s+name="' + re.escape(key) + r'"[^>]*>).*?(</string>)', re.S)
-    updated, count = pattern.subn(lambda m: m.group(1) + value + m.group(2), xml, count=1)
-    if count != 1:
-        raise SystemExit(f"Expected exactly one {key} in {relative}; found {count}")
-    path.write_text(updated, encoding="utf-8")
+replacements = {
+    "탐험가 닉네임 만들기": "나의 닉네임 만들기",
+    "지도와 향후 세계 탐험 랭킹에 표시할 이름입니다.": "MY EARTH에서 나를 표시하는 이름입니다.",
+    "Create explorer nickname": "Create my nickname",
+    "This name will appear on the map and future global exploration rankings.": "This is the name that represents me in MY EARTH.",
+}
+counts = {key: 0 for key in replacements}
+for path in res.rglob("*.xml"):
+    try:
+        value = path.read_text(encoding="utf-8")
+    except UnicodeDecodeError:
+        continue
+    updated = value
+    for old, new in replacements.items():
+        n = updated.count(old)
+        if n:
+            counts[old] += n
+            updated = updated.replace(old, new)
+    if updated != value:
+        path.write_text(updated, encoding="utf-8")
 
-# Korean UI
-update_string("values-ko/strings.xml", "nickname_create_title", "나의 닉네임 만들기")
-update_string("values-ko/strings.xml", "nickname_message", "MY EARTH에서 나를 표시하는 이름입니다. 닉네임은 2~12자로 입력해 주세요.")
-
-# English UI
-update_string("values/strings.xml", "nickname_create_title", "Create my nickname")
-update_string("values/strings.xml", "nickname_message", "This is the name that represents me in MY EARTH. Enter 2–12 characters.")
+if counts["탐험가 닉네임 만들기"] < 1 or counts["지도와 향후 세계 탐험 랭킹에 표시할 이름입니다."] < 1:
+    raise SystemExit("Could not find both outdated Korean nickname strings in Android resources: " + repr(counts))
 
 gradle = root / "app/build.gradle.kts"
 g = gradle.read_text(encoding="utf-8")
@@ -33,14 +40,12 @@ verify = root / "scripts/verify-service-lifecycle.sh"
 v = verify.read_text(encoding="utf-8")
 v += """
 # v0.10.22: personal nickname wording, without ranking references.
-grep -F '<string name="nickname_create_title">나의 닉네임 만들기</string>' app/src/main/res/values-ko/strings.xml >/dev/null
-grep -F 'MY EARTH에서 나를 표시하는 이름입니다.' app/src/main/res/values-ko/strings.xml >/dev/null
-grep -F '<string name="nickname_create_title">Create my nickname</string>' app/src/main/res/values/strings.xml >/dev/null
-grep -F 'This is the name that represents me in MY EARTH.' app/src/main/res/values/strings.xml >/dev/null
-! grep -F '세계 탐험 랭킹' app/src/main/res/values-ko/strings.xml
+grep -R -F '나의 닉네임 만들기' app/src/main/res >/dev/null
+grep -R -F 'MY EARTH에서 나를 표시하는 이름입니다.' app/src/main/res >/dev/null
+! grep -R -F '세계 탐험 랭킹' app/src/main/res
 grep -F 'versionCode = 75' app/build.gradle.kts >/dev/null
 grep -F 'versionName = "0.10.22"' app/build.gradle.kts >/dev/null
 """
 verify.write_text(v, encoding="utf-8")
 
-print("MY EARTH v0.10.22 Korean/English personal nickname wording applied.")
+print("MY EARTH v0.10.22 nickname wording updated in all matching Android resources: " + repr(counts))
