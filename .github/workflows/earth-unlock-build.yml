@@ -181,6 +181,29 @@ jobs:
         run: python patches/apply_v1027_account_deletion.py source
       - name: Apply v0.10.28 MY EARTH OpenStreetMap User-Agent
         run: python patches/apply_v1028_osm_user_agent.py source
+      - name: Verify Play release manifest and policy-critical configuration
+        working-directory: source
+        run: |
+          set -euo pipefail
+          GRADLE=app/build.gradle.kts
+          MANIFEST=app/src/main/AndroidManifest.xml
+          grep -F 'namespace = "com.earthunlock.app"' "$GRADLE"
+          grep -F 'applicationId = "com.earthunlock.app"' "$GRADLE"
+          grep -F 'compileSdk = 36' "$GRADLE"
+          grep -F 'targetSdk = 36' "$GRADLE"
+          grep -F 'versionCode = 81' "$GRADLE"
+          grep -F 'versionName = "0.10.28"' "$GRADLE"
+          grep -F 'android:foregroundServiceType="location"' "$MANIFEST"
+          grep -F 'android:usesCleartextTraffic="false"' "$MANIFEST"
+          if grep -q 'ACCESS_BACKGROUND_LOCATION' "$MANIFEST"; then
+            echo "Unexpected background location permission in manifest"
+            exit 1
+          fi
+          if grep -q 'android:exported="true"' "$MANIFEST" | grep -q 'LocationTrackingService'; then
+            echo "Location service must not be exported"
+            exit 1
+          fi
+          echo "Play release configuration checks passed."
       - name: Inspect account menu Kotlin source
         working-directory: source
         run: |
