@@ -14,12 +14,10 @@ def update_string(relative, key, value):
     path.write_text(updated, encoding="utf-8")
 
 # Korean UI
-update_string("values-ko/strings.xml", "nickname_accessibility", "나의 닉네임 설정")
 update_string("values-ko/strings.xml", "nickname_create_title", "나의 닉네임 만들기")
 update_string("values-ko/strings.xml", "nickname_message", "MY EARTH에서 나를 표시하는 이름입니다. 닉네임은 2~12자로 입력해 주세요.")
 
 # English UI
-update_string("values/strings.xml", "nickname_accessibility", "Set my nickname")
 update_string("values/strings.xml", "nickname_create_title", "Create my nickname")
 update_string("values/strings.xml", "nickname_message", "This is the name that represents me in MY EARTH. Enter 2–12 characters.")
 
