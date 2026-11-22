@@ -191,6 +191,13 @@ jobs:
         run: python patches/apply_v1032_account_deletion_recovery.py source
       - name: Apply v0.10.33 stop cloud backup after deletion failure
         run: python patches/apply_v1033_stop_backup_after_delete_failure.py source
+      - name: Snapshot assembled source before v0.10.34 patch
+        uses: actions/upload-artifact@v4
+        with:
+          name: MY-EARTH-pre-v1034-source
+          path: source/
+          if-no-files-found: error
+          retention-days: 3
       - name: Apply v0.10.34 explicit cloud backup consent
         run: python patches/apply_v1034_explicit_cloud_backup_consent.py source
       - name: Verify Play release policy and account deletion flow
