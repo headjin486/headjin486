@@ -89,3 +89,18 @@ Data safety 입력 전 확인해야 할 질문:
 - 신규 개인 개발자 계정 테스트 요건: https://support.google.com/googleplay/android-developer/answer/14151465
 
 주의: 이 문서는 내부 준비 문서이며 법률 자문이 아니다. 위치정보 관련 국내 법령상 신고·고지 의무는 운영 주체와 서비스 구조를 확인해 별도 검토한다.
+
+
+## 8. 2026-11-22 추가 검증 결과
+
+- 실제 v0.10.27 AAB를 내려받아 패키지명 `com.earthunlock.app`, 버전 `0.10.27`, AAB SHA-256을 확인했다.
+- AAB 의존성 메타데이터에서 Firebase Authentication, Firebase Firestore, osmdroid, Google Play services Location을 확인했다.
+- AAB 권한 문자열에서 `ACCESS_FINE_LOCATION`, `ACCESS_COARSE_LOCATION`, `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_LOCATION`을 확인했고 `ACCESS_BACKGROUND_LOCATION`은 발견되지 않았다.
+- AAB 의존성 메타데이터에서 AdMob 및 Firebase Analytics는 확인되지 않았다. 전체 네트워크/SDK 검증 전까지 최종 선언으로 확정하지 않는다.
+- AAB 내부 OSM 타일 엔드포인트는 `https://tile.openstreetmap.org/`이며, User-Agent가 `EarthExplorer/0.7.6`으로 남아 있는 문제를 발견했다. 이를 `MY EARTH`로 수정하는 v0.10.28 빌드를 진행 중이다.
+- OSMF 표준 타일 서버는 상업용 SLA가 없고 상업 서비스에 대해 접근 중단 가능성을 고지한다. 향후 광고 수익화 전에 상업 이용 조건이 명확한 타일 제공자로 전환하는 것을 권고한다.
+
+추가 내부 문서:
+- Data Safety 분류 및 AAB 검증: `docs/DATA_SAFETY_REVIEW_KO.md`
+- 외부 계정 삭제 수동 운영 절차: `docs/ACCOUNT_DELETION_OPERATIONS_KO.md`
+- 스토어 등록 문안: `docs/PLAY_STORE_LISTING_KO.md`
