@@ -49,50 +49,33 @@ replacement = r'''    private fun startGoogleRecoveryFlow(restoreExisting: Boole
 '''
 a = a[:start] + replacement + a[end:]
 
-old_already = r'''                if (current?.providerData?.any { it.providerId == "google.com" } == true) {
-                    FirebaseBackupManager.setEnabled(this, true)
-                    FirebaseBackupManager.requestSyncIfEnabled(this, store, true)
-                    Toast.makeText(this, "이미 Google 계정이 연결되어 있습니다.", Toast.LENGTH_SHORT).show()
-                } else if (current != null) {'''
-new_already = r'''                if (current?.providerData?.any { it.providerId == "google.com" } == true) {
-                    if (FirebaseBackupManager.isEnabled(this)) {
-                        FirebaseBackupManager.requestSyncIfEnabled(this, store, true)
-                    }
-                    Toast.makeText(this, "이미 Google 계정이 연결되어 있습니다. 클라우드 백업은 별도 설정에서 동의한 경우에만 실행됩니다.", Toast.LENGTH_LONG).show()
-                } else if (current != null) {'''
-if old_already not in a:
-    raise SystemExit("Already-linked Google branch not found")
-a = a.replace(old_already, new_already, 1)
-
-old_link = r'''                        .addOnSuccessListener {
-                            FirebaseBackupManager.setEnabled(this, true)
-                            FirebaseBackupManager.requestSyncIfEnabled(this, store, true)
-                            Toast.makeText(this, "현재 탐험 기록을 Google 계정에 연결했습니다.", Toast.LENGTH_LONG).show()
-                        }'''
-new_link = r'''                        .addOnSuccessListener {
-                            if (FirebaseBackupManager.isEnabled(this)) {
-                                FirebaseBackupManager.requestSyncIfEnabled(this, store, true)
-                            }
-                            Toast.makeText(this, "현재 탐험 기록을 Google 계정에 연결했습니다. 클라우드 백업은 별도 동의 후 사용할 수 있습니다.", Toast.LENGTH_LONG).show()
-                        }'''
-if old_link not in a:
-    raise SystemExit("Current anonymous account Google-link success block not found")
-a = a.replace(old_link, new_link, 1)
-
-old_anon = r'''                                    .addOnSuccessListener {
-                                        FirebaseBackupManager.setEnabled(this, true)
-                                        FirebaseBackupManager.requestSyncIfEnabled(this, store, true)
-                                        Toast.makeText(this, "현재 탐험 기록을 Google 계정에 연결했습니다.", Toast.LENGTH_LONG).show()
-                                    }'''
-new_anon = r'''                                    .addOnSuccessListener {
-                                        if (FirebaseBackupManager.isEnabled(this)) {
-                                            FirebaseBackupManager.requestSyncIfEnabled(this, store, true)
-                                        }
-                                        Toast.makeText(this, "현재 탐험 기록을 Google 계정에 연결했습니다. 클라우드 백업은 별도 동의 후 사용할 수 있습니다.", Toast.LENGTH_LONG).show()
-                                    }'''
-if old_anon not in a:
-    raise SystemExit("New anonymous account Google-link success block not found")
-a = a.replace(old_anon, new_anon, 1)
+# Remove implicit backup activation from every Google-linking branch.
+# Preserve a single activation only after the user confirms the existing-account restore dialog.
+activity_start = a.find("    override fun onActivityResult(")
+if activity_start < 0:
+    raise SystemExit("Google activity-result handler not found")
+activity_end = a.find("    private fun performAccountDeletion()", activity_start)
+if activity_end < 0:
+    activity_end = a.find("    private fun requestAndStart()", activity_start)
+if activity_end < 0:
+    raise SystemExit("Google activity-result handler boundary not found")
+handler = a[activity_start:activity_end]
+handler = handler.replace("FirebaseBackupManager.setEnabled(this, true)", "")
+# Only the existing-account restore branch may turn backup on, after explicit consent.
+restore_branch = handler.find("if (requestCode == 9205)")
+if restore_branch < 0:
+    raise SystemExit("Existing-account restore branch not found")
+restore_success = handler.find(".addOnSuccessListener {", restore_branch)
+if restore_success < 0:
+    raise SystemExit("Restore sign-in success callback not found")
+insert_at = handler.find("\\n", restore_success) + 1
+handler = handler[:insert_at] + "                        FirebaseBackupManager.setEnabled(this, true)\\n" + handler[insert_at:]
+# Account linking may sync only when backup was already separately enabled.
+handler = handler.replace(
+    "FirebaseBackupManager.requestSyncIfEnabled(this, store, true)",
+    "if (FirebaseBackupManager.isEnabled(this)) {\\n                            FirebaseBackupManager.requestSyncIfEnabled(this, store, true)\\n                        }"
+)
+a = a[:activity_start] + handler + a[activity_end:]
 
 # The only automatic enable in this flow must be behind the explicit restore consent.
 flow_start = a.find("    private fun startGoogleRecoveryFlow(restoreExisting: Boolean) {")
