@@ -208,10 +208,14 @@ jobs:
         working-directory: source
         run: |
           nl -ba app/src/main/java/com/earthunlock/app/MainActivity.kt | sed -n '330,400p'
-      - name: Run static lifecycle checks
+      - name: Check optional legacy lifecycle script
         working-directory: source
         run: |
-          bash scripts/verify-service-lifecycle.sh || echo "Legacy source-path assertion skipped; lifecycle checks reported above."
+          if [ -f scripts/verify-service-lifecycle.sh ]; then
+            bash scripts/verify-service-lifecycle.sh
+          else
+            echo "::warning::Legacy lifecycle script is not present in this source package; no static lifecycle-script check was run."
+          fi
       - name: Run unit tests and build signed release APK
         working-directory: source
         run: gradle --no-daemon :app:testDebugUnitTest :app:assembleRelease :app:bundleRelease
