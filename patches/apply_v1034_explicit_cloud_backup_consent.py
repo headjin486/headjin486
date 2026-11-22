@@ -68,12 +68,12 @@ if restore_branch < 0:
 restore_success = handler.find(".addOnSuccessListener {", restore_branch)
 if restore_success < 0:
     raise SystemExit("Restore sign-in success callback not found")
-insert_at = handler.find("\\n", restore_success) + 1
-handler = handler[:insert_at] + "                        FirebaseBackupManager.setEnabled(this, true)\\n" + handler[insert_at:]
+insert_at = handler.find("\n", restore_success) + 1
+handler = handler[:insert_at] + "                        FirebaseBackupManager.setEnabled(this, true)\n" + handler[insert_at:]
 # Account linking may sync only when backup was already separately enabled.
 handler = handler.replace(
     "FirebaseBackupManager.requestSyncIfEnabled(this, store, true)",
-    "if (FirebaseBackupManager.isEnabled(this)) {\\n                            FirebaseBackupManager.requestSyncIfEnabled(this, store, true)\\n                        }"
+    "if (FirebaseBackupManager.isEnabled(this)) {\n                            FirebaseBackupManager.requestSyncIfEnabled(this, store, true)\n                        }"
 )
 a = a[:activity_start] + handler + a[activity_end:]
 
