@@ -169,6 +169,8 @@ jobs:
         run: python patches/apply_v1018_interpolation_fix.py source
       - name: Apply v0.10.19 Kotlin string fix
         run: python patches/apply_v1019_kotlin_string_fix.py source
+      - name: Apply v0.10.20 incremental cloud backup
+        run: python patches/apply_v1020_incremental_backup.py source
       - name: Run static lifecycle checks
         working-directory: source
         run: |
