@@ -1,22 +1,24 @@
 # MY EARTH Data Safety 사전 점검표 (내부 초안)
 
 작성일: 2026-11-22  
-대상 빌드: v0.10.27 / versionCode 80  
-AAB SHA-256: 77a3e3ab90808a93b06a9816954b0aae90a8eb82d49718c1b035df36502931ef
+대상 빌드: v0.10.28 / versionCode 81  
+AAB SHA-256: f64326c87f920ef7b035d5e3da634ee1e01e4e95514ea70f9cb91ac2074d6b5e
 
 > 이 문서는 Play Console 설문을 대신하는 최종 답변이 아니다. 실제 Firebase Auth 프로필 필드, 네트워크 트래픽, 지도 타일 제공자 및 계정 삭제 운영을 확인한 후 확정한다.
 
-## 1. AAB에서 확인한 항목
+## 1. AAB에서 확인한 항목 (v0.10.28)
 
 - AAB 패키지명: com.earthunlock.app
-- AAB 버전: 0.10.27
+- AAB 버전: 0.10.28 / versionCode 81
 - 빌드 산출물: app-release.aab
 - AAB JAR 서명 검증: jarsigner에서 서명 검증 성공. 업로드 키 인증서는 자체 서명이며 공개 CA 체인으로 검증되는 인증서가 아님.
 - 의존성 메타데이터에서 확인: Firebase Authentication, Firebase Firestore, osmdroid, Google Play services Location
 - 의존성 메타데이터에서 AdMob 및 Firebase Analytics SDK는 확인되지 않음. 이는 광고·분석 SDK가 없다는 강한 단서이나, 최종적으로 모든 모듈 및 네트워크 트래픽을 대조해야 함.
 - 소스 프로젝트의 Gradle 설정: compileSdk 36 / targetSdk 36 / minSdk 26
 - AAB의 manifest permission 문자열에서 확인: INTERNET, ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION, FOREGROUND_SERVICE, FOREGROUND_SERVICE_LOCATION
-- ACCESS_BACKGROUND_LOCATION은 AAB manifest의 권한 문자열에서 확인되지 않음.
+- ACCESS_BACKGROUND_LOCATION은 v0.10.28 AAB manifest의 권한 문자열에서 확인되지 않음.
+- OSM 타일 엔드포인트: `https://tile.openstreetmap.org/`
+- DEX의 User-Agent: `MY EARTH/0.10.28 (Android; com.earthunlock.app; contact: headjin486@gmail.com)` 확인. 이전 `EarthExplorer/0.7.6` 문자열은 발견되지 않음.
 - LocationTrackingService는 location foreground service로 선언되어 있음.
 
 ## 2. Data Safety 분류 후보
@@ -77,3 +79,11 @@ OpenStreetMap 표준 타일 서버(tile.openstreetmap.org)를 사용하는 경�
 - [ ] Data Safety의 수집/공유/선택 여부/목적 확정
 - [ ] 계정 삭제 이메일 처리 운영자·기한·절차 확정 및 테스트
 - [ ] 개인정보처리방침의 타일 제공자, Firebase, 보유·삭제 설명 업데이트
+
+
+## 7. v0.10.28 기준 재확인 메모
+
+- 이 문서는 v0.10.28 AAB를 기준으로 갱신했지만 Data Safety 최종 설문을 확정한 것은 아니다.
+- AAB 정적 분석만으로는 실제 네트워크 전송 여부, Firebase Auth 프로필 필드, Firestore 백업 거부 상태의 쓰기 여부를 확정할 수 없다.
+- 실기기에서 선택형 백업 동의/거부, Google 계정 연결, 계정 삭제를 재시험한 뒤 체크리스트를 완료한다.
+- 광고 및 분석 SDK는 AAB 의존성 메타데이터에서 확인되지 않았으나, 전체 SDK 및 실제 트래픽 대조 전까지 최종 신고 문구로 단정하지 않는다.
