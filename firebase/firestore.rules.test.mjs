@@ -32,11 +32,29 @@ test("backup chunks are private to the authenticated owner", async () => {
   await assertSucceeds(deleteDoc(ref));
 });
 
+test("timestamp-only backup status marker is writable and private to its owner", async () => {
+  const owner = env.authenticatedContext("alice").firestore();
+  const stranger = env.authenticatedContext("bob").firestore();
+  const marker = doc(owner, "exploration_backups", "alice", "chunks", "_backup_status");
+  await assertSucceeds(setDoc(marker, { kind: "backup_status", updatedAt: serverTimestamp() }));
+  await assertSucceeds(getDoc(marker));
+  await assertFails(getDoc(doc(stranger, "exploration_backups", "alice", "chunks", "_backup_status")));
+  await assertFails(setDoc(doc(owner, "exploration_backups", "alice", "chunks", "_backup_status"), {
+    kind: "backup_status", updatedAt: serverTimestamp(), payload: "unexpected"
+  }));
+  await assertFails(setDoc(doc(owner, "exploration_backups", "alice", "chunks", "_backup_status"), {
+    kind: "wrong_kind", updatedAt: serverTimestamp()
+  }));
+});
+
 test("unauthenticated users cannot read or write backups", async () => {
   const db = env.unauthenticatedContext().firestore();
   const ref = doc(db, "exploration_backups", "alice", "chunks", "chunk-0001");
   await assertFails(getDoc(ref));
   await assertFails(setDoc(ref, { formatVersion: 1, payload: "data", updatedAt: serverTimestamp() }));
+  await assertFails(setDoc(doc(db, "exploration_backups", "alice", "chunks", "_backup_status"), {
+    kind: "backup_status", updatedAt: serverTimestamp()
+  }));
 });
 
 test("backup schema rejects unsupported versions and unexpected fields", async () => {
