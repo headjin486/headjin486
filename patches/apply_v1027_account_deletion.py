@@ -16,20 +16,13 @@ if "계정 및 클라우드 데이터 삭제" not in a:
         raise SystemExit("Compact account menu lambda not found")
     a = a[:menu_end] + ', "계정 및 클라우드 데이터 삭제"' + a[menu_end:]
 
-    outer_else = '''                        } else {
-                            AlertDialog.Builder(this@MainActivity)
-                                .setTitle("Google 계정으로 기록 보호")'''
-    if a.count(outer_else) != 1:
-        raise SystemExit("Unique outer Google account menu branch not found")
-    a = a.replace(
-        outer_else,
-        '''                        } else if (which == 1) {
-                            AlertDialog.Builder(this@MainActivity)
-                                .setTitle("Google 계정으로 기록 보호")''',
-        1
-    )
+    google_title = a.find('.setTitle("Google 계정으로 기록 보호")', menu_start)
+    branch_start = a.rfind("} else {", menu_start, google_title)
+    if google_title < 0 or branch_start < 0:
+        raise SystemExit("Google account menu branch anchor not found")
+    a = a[:branch_start] + a[branch_start:].replace("} else {", "} else if (which == 1) {", 1)
 
-    menu_close = '\n                    }\n                    .setNegativeButton("닫기", null)'
+    menu_close = '\\n                    }\\n                    .setNegativeButton("닫기", null)'
     close_at = a.find(menu_close, google_title)
     if close_at < 0:
         raise SystemExit("Compact account menu lambda ending not found")
