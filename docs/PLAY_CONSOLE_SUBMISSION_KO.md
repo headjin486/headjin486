@@ -85,7 +85,7 @@ Data Safety 설문은 별도 내부 문서 `docs/DATA_SAFETY_REVIEW_KO.md`를 �
 - [ ] 운영 Firebase 테스트 계정으로 Google OAuth / 계정 연결 / 복원 확인.
 - [ ] 백업 동의 거부 상태에서 Firestore 쓰기가 없는지 확인.
 - [ ] 계정 삭제 테스트 계정 리허설: Firestore 청크 및 Firebase Auth UID 모두 삭제 확인.
-- [ ] 익명 계정의 최근 로그인 요구 및 부분 실패 처리 확인.
+- [ ] 익명 계정의 재인증 없는 삭제 및 Auth/Firestore 부분 실패 처리 확인.
 - [ ] 외부 삭제 이메일 접수·소유 확인·처리·회신 운영 절차 검증.
 - [ ] 최신 AAB의 전체 SDK 및 실제 외부 네트워크 수신자 확인.
 - [ ] Data Safety 최종 답변 확정.
