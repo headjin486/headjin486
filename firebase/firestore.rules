@@ -4,17 +4,29 @@ service cloud.firestore {
     function signedIn() { return request.auth != null; }
     function owns(uid) { return signedIn() && request.auth.uid == uid; }
 
-    // Only revealed 5 m grid-cell identifiers are stored. Never store raw GPS tracks.
-    match /exploration_backups/{uid}/chunks/{chunkId} {
-      allow read, delete: if owns(uid);
-      allow create, update: if owns(uid)
-        && request.resource.data.keys().hasOnly(['formatVersion', 'payload', 'updatedAt'])
+    function validBackupChunk() {
+      return request.resource.data.keys().hasOnly(['formatVersion', 'payload', 'updatedAt'])
         && request.resource.data.keys().hasAll(['formatVersion', 'payload', 'updatedAt'])
         && request.resource.data.formatVersion is int
         && request.resource.data.formatVersion == 1
         && request.resource.data.payload is string
         && request.resource.data.payload.size() <= 700000
         && request.resource.data.updatedAt is timestamp;
+    }
+
+    function validBackupStatus() {
+      return request.resource.data.keys().hasOnly(['kind', 'updatedAt'])
+        && request.resource.data.keys().hasAll(['kind', 'updatedAt'])
+        && request.resource.data.kind == 'backup_status'
+        && request.resource.data.updatedAt is timestamp;
+    }
+
+    // Only revealed 5 m grid-cell identifiers are stored. Never store raw GPS tracks.
+    match /exploration_backups/{uid}/chunks/{chunkId} {
+      allow read, delete: if owns(uid);
+      // Cell payloads and the timestamp-only status marker have separate schemas.
+      allow create, update: if owns(uid)
+        && (validBackupChunk() || validBackupStatus());
     }
   }
 }
