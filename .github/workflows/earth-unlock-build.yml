@@ -175,6 +175,8 @@ jobs:
         run: python patches/apply_v1021_compact_cloud_account_menu.py source
       - name: Apply v0.10.22 personal nickname wording
         run: python patches/apply_v1022_nickname_wording.py source
+      - name: Apply v0.10.26 Play policy location disclosure and privacy notice
+        run: python patches/apply_v1026_play_policy_disclosure.py source
       - name: Run static lifecycle checks
         working-directory: source
         run: |
