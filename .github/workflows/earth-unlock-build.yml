@@ -187,6 +187,8 @@ jobs:
         run: python patches/apply_v1030_location_disclosure.py source
       - name: Apply v0.10.31 exclusive account menu branches
         run: python patches/apply_v1031_account_menu_branch.py source
+      - name: Apply v0.10.32 account deletion partial-failure recovery
+        run: python patches/apply_v1032_account_deletion_recovery.py source
       - name: Verify Play release policy and account deletion flow
         working-directory: source
         run: python scripts/verify-play-release-policy.py
@@ -200,8 +202,8 @@ jobs:
           grep -F 'applicationId = "com.earthunlock.app"' "$GRADLE"
           grep -F 'compileSdk = 36' "$GRADLE"
           grep -F 'targetSdk = 36' "$GRADLE"
-          grep -F 'versionCode = 84' "$GRADLE"
-          grep -F 'versionName = "0.10.31"' "$GRADLE"
+          grep -F 'versionCode = 85' "$GRADLE"
+          grep -F 'versionName = "0.10.32"' "$GRADLE"
           grep -F 'android:foregroundServiceType="location"' "$MANIFEST"
           grep -F 'android:usesCleartextTraffic="false"' "$MANIFEST"
           if grep -q 'ACCESS_BACKGROUND_LOCATION' "$MANIFEST"; then
