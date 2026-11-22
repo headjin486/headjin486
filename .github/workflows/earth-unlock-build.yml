@@ -220,3 +220,5 @@ jobs:
           path: source/app/build/outputs/bundle/release/app-release.aab
           if-no-files-found: error
           retention-days: 30
+
+# Rebuild after account deletion menu syntax correction
