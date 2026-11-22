@@ -4,7 +4,9 @@
   "version": "1.0.0",
   "description": "Firestore Security Rules emulator tests for EARTH UNLOCK",
   "scripts": {
-    "test:rules": "firebase emulators:exec --only firestore --project demo-earth-unlock \"node --test firestore.rules.test.mjs\""
+    "test:rules": "firebase emulators:exec --only firestore --project demo-earth-unlock \"node --test firestore.rules.test.mjs\"",
+    "test:account-deletion": "firebase emulators:exec --only auth,firestore --project demo-earth-unlock \"node --test account-deletion.emulator.test.mjs\"",
+    "test:all": "npm run test:rules && npm run test:account-deletion"
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "^4.0.1",
