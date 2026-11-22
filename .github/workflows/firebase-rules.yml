@@ -1,4 +1,4 @@
-name: EARTH UNLOCK Firebase Rules Tests
+name: MY EARTH Firebase Emulator Tests
 
 on:
   push:
@@ -35,6 +35,6 @@ jobs:
       - name: Install test dependencies
         working-directory: firebase
         run: npm install --no-audit --no-fund
-      - name: Test Firestore rules in emulator
+      - name: Test Firestore rules and account deletion in emulators
         working-directory: firebase
-        run: npm run test:rules
+        run: npm run test:all
