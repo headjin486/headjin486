@@ -29,8 +29,8 @@ if menu_start < 0 or menu_end < 0:
 menu = a[menu_start:menu_end]
 if "else if (which == 2)" not in menu or "else if (which == 3)" not in menu:
     raise SystemExit("Account menu is not a mutually exclusive 0/1/2/3 branch chain")
-if "if (which == 3)" in menu:
-    raise SystemExit("Independent deletion if still exists")
+if menu.count("which == 3") != 1:
+    raise SystemExit("Expected exactly one deletion branch")
 activity.write_text(a, encoding="utf-8")
 
 verifier = root / "scripts/verify-play-release-policy.py"
@@ -38,7 +38,7 @@ v = verifier.read_text(encoding="utf-8")
 v = v.replace('assert "if (which == 3) {\\n                            confirmAccountDeletion()" in activity',
               'assert "else if (which == 2)" in activity and "else if (which == 3)" in activity')
 v = v.replace('assert "if (which == 2) {\\n                            confirmAccountDeletion()" not in activity',
-              'assert "if (which == 3) {\\n                            confirmAccountDeletion()" not in activity')
+              'assert activity.count("which == 3") == 1')
 v = v.replace("versionCode = 83", "versionCode = 84")
 v = v.replace('versionName = "0.10.30"', 'versionName = "0.10.31"')
 verifier.write_text(v, encoding="utf-8")
