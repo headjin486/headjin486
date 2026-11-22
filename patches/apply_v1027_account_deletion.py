@@ -29,7 +29,8 @@ if "계정 및 클라우드 데이터 삭제" not in a:
     if close_at < 0:
         raise SystemExit("Google account branch ending not found")
     replacement = (
-        '\n                        } else {\n'
+        '\n                        }\n'
+        '                        if (which == 3) {\n'
         '                            confirmAccountDeletion()\n'
         '                        }\n'
         '                    }'
