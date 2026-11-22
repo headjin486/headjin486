@@ -83,8 +83,15 @@ flow_end = a.find("    private fun requestAndStart() {", flow_start)
 if flow_start < 0 or flow_end < 0:
     raise SystemExit("Updated Google recovery flow could not be verified")
 flow = a[flow_start:flow_end]
-if flow.count("FirebaseBackupManager.setEnabled(this, true)") != 1:
-    raise SystemExit("Expected exactly one consent-gated backup enable in Google recovery flow")
+handler_start = a.find("    override fun onActivityResult(")
+handler_end = a.find("    private fun performAccountDeletion()", handler_start)
+if handler_end < 0:
+    handler_end = a.find("    private fun requestAndStart()", handler_start)
+handler = a[handler_start:handler_end]
+restore_pos = handler.find("if (requestCode == 9205)")
+enable_pos = handler.find("FirebaseBackupManager.setEnabled(this, true)")
+if restore_pos < 0 or enable_pos < restore_pos or handler.count("FirebaseBackupManager.setEnabled(this, true)") != 1:
+    raise SystemExit("Expected exactly one backup enable inside the explicit existing-account restore branch")
 if '.setPositiveButton("동의하고 복원")' not in flow:
     raise SystemExit("Explicit restore consent action is missing")
 activity.write_text(a, encoding="utf-8")
@@ -110,7 +117,11 @@ flow_end = activity.index("private fun requestAndStart()", flow_start)
 google_flow = activity[flow_start:flow_end]
 assert '.setPositiveButton("동의하고 복원")' in google_flow
 assert "기존 Google 계정 복원 및 백업 설정" in google_flow
-assert google_flow.count("FirebaseBackupManager.setEnabled(this, true)") == 1
+handler_start = activity.index("override fun onActivityResult(")
+handler_end = activity.index("private fun performAccountDeletion()", handler_start)
+google_handler = activity[handler_start:handler_end]
+assert google_handler.count("FirebaseBackupManager.setEnabled(this, true)") == 1
+assert google_handler.index("if (requestCode == 9205)") < google_handler.index("FirebaseBackupManager.setEnabled(this, true)")
 assert "클라우드 백업은 별도 동의 후 사용할 수 있습니다." in google_flow
 '''
 if extra.strip() not in v:
