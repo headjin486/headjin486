@@ -76,3 +76,10 @@ grep -F 'versionName = "0.10.24"' app/build.gradle.kts >/dev/null
 verify.write_text(v, encoding="utf-8")
 
 print("MY EARTH v0.10.24 patch applied: timestamp reads from existing backup chunks.")
+
+# v0.10.25: refresh a dedicated timestamp marker after every successful sync.
+import subprocess
+subprocess.run(
+    [sys.executable, str(root.parent / "patches/apply_v1025_backup_timestamp_refresh.py"), str(root)],
+    check=True,
+)
