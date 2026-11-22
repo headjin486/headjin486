@@ -13,7 +13,7 @@ on:
 permissions:
   contents: read
 
-# MY EARTH v0.10.21: compact cloud/account controls
+# MY EARTH v0.10.22: personal nickname wording
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -173,6 +173,8 @@ jobs:
         run: python patches/apply_v1020_incremental_backup.py source
       - name: Apply v0.10.21 compact cloud and Google account menu
         run: python patches/apply_v1021_compact_cloud_account_menu.py source
+      - name: Apply v0.10.22 personal nickname wording
+        run: python patches/apply_v1022_nickname_wording.py source
       - name: Run static lifecycle checks
         working-directory: source
         run: |
