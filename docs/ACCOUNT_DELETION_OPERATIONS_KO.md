@@ -1,7 +1,10 @@
 # MY EARTH 외부 계정 삭제 요청 처리 절차 (운영 초안)
 
 작성일: 2026-11-22  
-대상: https://headjin486.github.io/headjin486/delete-account.html  
+대상: https://headjin486.github.io/headjin486/delete-account.html
+현재 검증 빌드: v0.10.33 / versionCode 86
+
+> 최신 v0.10.33에서는 삭제 실패 후 자동 클라우드 백업을 중지한다. 이는 부분 삭제된 백업을 되살리지 않으며, 실제 운영 Firebase에서 전체 삭제 성공을 보장하는 검증은 아니다.  
 문의 이메일: headjin486@gmail.com
 
 > 현재 외부 웹 경로는 이메일 요청을 접수하는 수동 방식이다. 자동 삭제 시스템이 아니다. 운영자가 실제로 처리할 수 있는지 확인하고 처리 기한을 확정한 뒤 공개 페이지와 Play Console에 반영한다.
