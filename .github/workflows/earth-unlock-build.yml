@@ -182,7 +182,7 @@ jobs:
       - name: Inspect account menu Kotlin source
         working-directory: source
         run: |
-          nl -ba app/src/main/java/com/earthunlock/app/MainActivity.kt | sed -n '365,400p'
+          nl -ba app/src/main/java/com/earthunlock/app/MainActivity.kt | sed -n '330,400p'
       - name: Run static lifecycle checks
         working-directory: source
         run: |
