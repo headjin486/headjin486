@@ -1,22 +1,27 @@
 from pathlib import Path
-import sys
+import re, sys
 
 root = Path(sys.argv[1])
-activity = root / "app/src/main/java/com/earthunlock/app/MainActivity.kt"
-s = activity.read_text(encoding="utf-8")
+res = root / "app/src/main/res"
 
-old_title = '.setTitle(if (required) "탐험가 닉네임 만들기" else "닉네임 변경")'
-new_title = '.setTitle(if (required) "나의 닉네임 만들기" else "닉네임 변경")'
-old_message = '.setMessage("지도와 향후 세계 탐험 랭킹에 표시할 이름입니다. 닉네임은 2~12자로 입력해 주세요.")'
-new_message = '.setMessage("MY EARTH에서 나를 표시하는 이름입니다. 닉네임은 2~12자로 입력해 주세요.")'
+def update_string(relative, key, value):
+    path = res / relative
+    xml = path.read_text(encoding="utf-8")
+    pattern = re.compile(r'(<string\\s+name="' + re.escape(key) + r'"[^>]*>).*?(</string>)', re.S)
+    updated, count = pattern.subn(lambda m: m.group(1) + value + m.group(2), xml, count=1)
+    if count != 1:
+        raise SystemExit(f"Expected exactly one {key} in {relative}; found {count}")
+    path.write_text(updated, encoding="utf-8")
 
-if s.count(old_title) != 1:
-    raise SystemExit("Expected nickname dialog title was not found exactly once")
-if s.count(old_message) != 1:
-    raise SystemExit("Expected outdated ranking explanation was not found exactly once")
+# Korean UI
+update_string("values-ko/strings.xml", "nickname_accessibility", "나의 닉네임 설정")
+update_string("values-ko/strings.xml", "nickname_create_title", "나의 닉네임 만들기")
+update_string("values-ko/strings.xml", "nickname_message", "MY EARTH에서 나를 표시하는 이름입니다. 닉네임은 2~12자로 입력해 주세요.")
 
-s = s.replace(old_title, new_title, 1).replace(old_message, new_message, 1)
-activity.write_text(s, encoding="utf-8")
+# English UI
+update_string("values/strings.xml", "nickname_accessibility", "Set my nickname")
+update_string("values/strings.xml", "nickname_create_title", "Create my nickname")
+update_string("values/strings.xml", "nickname_message", "This is the name that represents me in MY EARTH. Enter 2–12 characters.")
 
 gradle = root / "app/build.gradle.kts"
 g = gradle.read_text(encoding="utf-8")
@@ -29,13 +34,15 @@ gradle.write_text(g, encoding="utf-8")
 verify = root / "scripts/verify-service-lifecycle.sh"
 v = verify.read_text(encoding="utf-8")
 v += """
-# v0.10.22: personal nickname wording, with no ranking language.
-grep -F '나의 닉네임 만들기' app/src/main/java/com/earthunlock/app/MainActivity.kt >/dev/null
-grep -F 'MY EARTH에서 나를 표시하는 이름입니다.' app/src/main/java/com/earthunlock/app/MainActivity.kt >/dev/null
-! grep -F '세계 탐험 랭킹' app/src/main/java/com/earthunlock/app/MainActivity.kt
+# v0.10.22: personal nickname wording, without ranking references.
+grep -F '<string name="nickname_create_title">나의 닉네임 만들기</string>' app/src/main/res/values-ko/strings.xml >/dev/null
+grep -F 'MY EARTH에서 나를 표시하는 이름입니다.' app/src/main/res/values-ko/strings.xml >/dev/null
+grep -F '<string name="nickname_create_title">Create my nickname</string>' app/src/main/res/values/strings.xml >/dev/null
+grep -F 'This is the name that represents me in MY EARTH.' app/src/main/res/values/strings.xml >/dev/null
+! grep -F '세계 탐험 랭킹' app/src/main/res/values-ko/strings.xml
 grep -F 'versionCode = 75' app/build.gradle.kts >/dev/null
 grep -F 'versionName = "0.10.22"' app/build.gradle.kts >/dev/null
 """
 verify.write_text(v, encoding="utf-8")
 
-print("MY EARTH v0.10.22 nickname wording updated.")
+print("MY EARTH v0.10.22 Korean/English personal nickname wording applied.")
