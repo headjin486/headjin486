@@ -83,6 +83,23 @@ Firebase 공식 Android 문서에 따르면 계정 삭제는 최근 로그인 �
 3. 익명 계정은 장기 세션에서 삭제가 성공하는지, 실패 시 백업 선삭제가 발생하는지 별도로 관찰한다.
 4. 어느 경우든 다른 UID의 백업은 변하지 않는다.
 
+## 9. 로컬 Firebase Emulator 자동 검증 결과 (2026-11-22)
+
+GitHub Actions 실행 #45019167037에서 Firebase Authentication Emulator와 Firestore Emulator를 사용한 테스트가 통과했다.
+
+- 익명 Auth 사용자 삭제 후 해당 UID의 테스트 백업 청크 3개가 모두 삭제되는 것을 확인했다.
+- 이메일/비밀번호 Auth 사용자 삭제 후 해당 UID의 테스트 백업 청크 3개가 모두 삭제되는 것을 확인했다.
+- 두 시나리오 모두 별도 UID의 테스트 백업 3개가 유지되는 것을 확인했다.
+- Firestore 보안 규칙 테스트 4개와 계정 삭제 통합 테스트 2개가 모두 통과했다.
+
+검증 범위의 한계:
+- Firebase Emulator의 로컬 테스트이며 운영 Firebase 프로젝트의 실제 계정을 삭제한 것이 아니다.
+- Google OAuth 로그인/ID token 재인증 및 실제 Android 앱의 재인증 UI 흐름은 검증하지 않았다.
+- 실제 앱의 Firestore 삭제 코드와 Auth 삭제를 기기에서 연결해 검증한 것도 아니다.
+- 따라서 실제 운영 계정 삭제의 완전한 검증 완료로 표시하지 않는다. Google 재인증과 Android 실기기 검증은 별도 출시 차단 항목이다.
+
+실행 결과: https://github.com/headjin486/headjin486/actions/runs/45019167037
+
 ## 7. 운영상 주의
 
 - 이 절차는 수동 운영이므로 “즉시 자동 삭제”라고 광고하거나 표시하지 않는다.
