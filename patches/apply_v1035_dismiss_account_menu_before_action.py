@@ -33,6 +33,14 @@ if 'versionCode = 87' not in v or 'versionName = "0.10.34"' not in v:
     raise SystemExit("Expected v0.10.34 verifier assertions")
 v = v.replace('versionCode = 87', 'versionCode = 88', 1)
 v = v.replace('versionName = "0.10.34"', 'versionName = "0.10.35"', 1)
+# The release verifier originally expected the anonymous lambda parameter; v0.10.35 names it to dismiss the parent dialog.
+regex_old = 'r"setItems\\(arrayOf\\((.*?)\\)\\)\\s*\\{\\s*_,\\s*which\\s*->"'
+regex_new = 'r"setItems\\(arrayOf\\((.*?)\\)\\)\\s*\\{\\s*[^,]+,\\s*which\\s*->"'
+if regex_old in v:
+    v = v.replace(regex_old, regex_new, 1)
+elif regex_new not in v:
+    raise SystemExit("Account menu verifier regex anchor missing")
+
 anchor = 'assert "else if (which == 2)" in activity and "else if (which == 3)" in activity'
 if anchor not in v:
     raise SystemExit("Account menu branch verifier anchor missing")
