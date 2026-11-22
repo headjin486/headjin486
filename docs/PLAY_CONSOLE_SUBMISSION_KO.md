@@ -3,7 +3,7 @@
 최종 점검일: 2026-11-22
 앱: MY EARTH
 패키지: com.earthunlock.app
-현재 검증 빌드: v0.10.33 / versionCode 86
+현재 검증 빌드: v0.10.34 / versionCode 87
 compileSdk / targetSdk: 36 / 36
 상태: 개발자 신원 확인 및 출시 필수 검증 진행 중
 
@@ -19,14 +19,14 @@ MY EARTH는 사용자가 실제로 지나온 길과 장소를 개인 지도로 �
 
 ## 2. 검증 빌드
 
-- versionName: 0.10.33
-- versionCode: 86
+- versionName: 0.10.34
+- versionCode: 87
 - applicationId: com.earthunlock.app
 - targetSdk: 36
-- GitHub Actions 성공 실행: https://github.com/headjin486/headjin486/actions/runs/45029892659
-- APK SHA-256: 4edd25a688163c18b764e6453eae854f048178902f0fcd91c1487442ce44feb0
-- AAB SHA-256: fdbb4762795dfa6e9d1575ca0a46da2e39bfc1f5ee739fcc139c9ccadc0e095d
-- 기존 서명 인증서 지문과 APK 서명 일치 확인 통과.
+- GitHub Actions 성공 실행: https://github.com/headjin486/headjin486/actions/runs/45031583947
+- APK SHA-256: f96aca271d95f1c58adf711a696fef4674aab7f21e7628f11395121f37e84ab8
+- AAB SHA-256: 24a15dbb696c35f13bf0e3b7fc3de659e02a0f7fc6ca03d5451b7673eb26999e
+- 기존 서명 인증서 지문과 APK 서명 일치 확인 통과. v0.10.34에서 Google 계정 전환 전 백업 동의를 초기화하고, 새 계정의 백업 동의 거절 시 자동 백업을 끄는 수정이 포함됨.
 - AAB JAR 서명 검증 통과.
 - 단위 테스트 및 Android Release APK/AAB 빌드 통과.
 - 패키지 ID, 버전, 위치 FGS, cleartext false, 백그라운드 위치 권한 미선언 정적 검사 통과.
