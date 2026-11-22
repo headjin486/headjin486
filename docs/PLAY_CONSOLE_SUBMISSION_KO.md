@@ -116,3 +116,10 @@ Data safety 입력 전 확인해야 할 질문:
 - AAB DEX에서 새 User-Agent 문자열 `MY EARTH/0.10.28 (Android; com.earthunlock.app; contact: headjin486@gmail.com)`을 확인했고, 이전 `EarthExplorer/0.7.6` 문자열은 발견되지 않았다.
 - AAB manifest에서 package `com.earthunlock.app`, versionName `0.10.28`, 위치 및 위치 포그라운드 서비스 권한을 확인했다. `ACCESS_BACKGROUND_LOCATION`은 manifest 문자열에서 발견되지 않았다.
 - 빌드 성공은 실제 스마트폰에서의 지도 타일 응답·GPS·로그인/백업 기능의 재시험을 대체하지 않는다. 사용자가 설치 테스트를 하기 전까지 실기기 검증은 미완료로 유지한다.
+
+## 10. 2026-11-22 계정 삭제 메뉴 점검 및 수정
+
+- v0.10.27 계정 삭제 메뉴 항목은 배열의 세 번째 항목(인덱스 2)이지만, 실행 분기가 `which == 3`을 검사해 삭제 메뉴를 눌러도 삭제 확인 창이 열리지 않는 결함을 확인했다.
+- v0.10.29 패치에서 실행 인덱스를 2로 수정하고, 메뉴 항목 순서·인덱스·Firestore 청크 삭제 후 Auth 계정 삭제 순서를 검사하는 별도 엄격 검증 스크립트를 추가했다.
+- 이 수정은 소스 및 CI에 반영됐으며, v0.10.29 빌드/검증 결과는 GitHub Actions 실행 완료 후 기록한다.
+- Firebase 실제 데이터 삭제 리허설은 운영 Firebase 테스트 계정이 필요하므로 아직 미완료다. 실제 삭제 성공을 주장하지 않는다.
