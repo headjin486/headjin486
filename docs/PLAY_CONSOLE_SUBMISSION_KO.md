@@ -104,3 +104,15 @@ Data safety 입력 전 확인해야 할 질문:
 - Data Safety 분류 및 AAB 검증: `docs/DATA_SAFETY_REVIEW_KO.md`
 - 외부 계정 삭제 수동 운영 절차: `docs/ACCOUNT_DELETION_OPERATIONS_KO.md`
 - 스토어 등록 문안: `docs/PLAY_STORE_LISTING_KO.md`
+
+
+## 9. v0.10.28 최종 빌드 확인 (2026-11-22)
+
+- GitHub Actions run: https://github.com/headjin486/headjin486/actions/runs/45009972849
+- 결과: 정적 수명주기 검사, 단위 테스트, Release APK 빌드, APK 서명 검증, AAB 생성 및 업로드 단계 모두 성공.
+- versionName: 0.10.28 / versionCode: 81 / applicationId: com.earthunlock.app
+- AAB SHA-256: `f64326c87f920ef7b035d5e3da634ee1e01e4e95514ea70f9cb91ac2074d6b5e`
+- APK SHA-256: `dc8b1f57b8ef82e19f6e961ef838dcc71f0928845232f329da20c29e4ddc4df4`
+- AAB DEX에서 새 User-Agent 문자열 `MY EARTH/0.10.28 (Android; com.earthunlock.app; contact: headjin486@gmail.com)`을 확인했고, 이전 `EarthExplorer/0.7.6` 문자열은 발견되지 않았다.
+- AAB manifest에서 package `com.earthunlock.app`, versionName `0.10.28`, 위치 및 위치 포그라운드 서비스 권한을 확인했다. `ACCESS_BACKGROUND_LOCATION`은 manifest 문자열에서 발견되지 않았다.
+- 빌드 성공은 실제 스마트폰에서의 지도 타일 응답·GPS·로그인/백업 기능의 재시험을 대체하지 않는다. 사용자가 설치 테스트를 하기 전까지 실기기 검증은 미완료로 유지한다.
