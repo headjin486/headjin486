@@ -52,7 +52,7 @@ a = a[:start] + replacement + a[end:]
 old_already = r'''                if (current?.providerData?.any { it.providerId == "google.com" } == true) {
                     FirebaseBackupManager.setEnabled(this, true)
                     FirebaseBackupManager.requestSyncIfEnabled(this, store, true)
-                    Toast.makeText(this, "Google 계정 연결 완료. 기존 기록을 복원하고 있습니다.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "이미 Google 계정이 연결되어 있습니다.", Toast.LENGTH_SHORT).show()
                 } else if (current != null) {'''
 new_already = r'''                if (current?.providerData?.any { it.providerId == "google.com" } == true) {
                     if (FirebaseBackupManager.isEnabled(this)) {
