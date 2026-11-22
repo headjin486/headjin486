@@ -22,6 +22,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Revoke prior source artifacts containing signing material
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          for artifact_id in 14759805773 14759537302 14759865826 14759161645 14758943319 14759106923 14758253843 14758368284 14758683811; do
+            if gh api "/repos/${GITHUB_REPOSITORY}/actions/artifacts/${artifact_id}" >/dev/null 2>&1; then
+              gh api --method DELETE "/repos/${GITHUB_REPOSITORY}/actions/artifacts/${artifact_id}"
+              echo "Deleted exposed artifact ${artifact_id}"
+            else
+              echo "Artifact ${artifact_id} already absent"
+            fi
+          done
+
       - name: Extract Android project
         run: |
           unzip -q EarthExplorerAndroid_MVP_v0.7.4_Source.zip -d source
@@ -204,12 +218,6 @@ jobs:
         run: python patches/apply_v1038_deferred_account_menu_action.py source
       - name: Apply v0.10.39 fix deferred dispatcher reference
         run: python patches/apply_v1039_fix_deferred_dispatcher.py source
-      - name: Remove prior artifact containing signing material
-        env:
-          GH_TOKEN: ${{ github.token }}
-          EXPOSED_ARTIFACT_ID: 14759805773
-        run: |
-          gh api --method DELETE "/repos/${GITHUB_REPOSITORY}/actions/artifacts/${EXPOSED_ARTIFACT_ID}"
       - name: Upload fully patched source for diagnostics (exclude signing material)
         uses: actions/upload-artifact@v4
         with:
