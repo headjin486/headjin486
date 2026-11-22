@@ -9,37 +9,24 @@ a = activity.read_text(encoding="utf-8")
 
 # Add the deletion action to the compact account menu introduced in v0.10.21.
 if "계정 및 클라우드 데이터 삭제" not in a:
-    menu_pattern = re.compile(
-        r'setItems\s*\(\s*arrayOf\(\s*"클라우드 백업 설정 / 지금 백업"\s*,\s*"Google 계정 연결 / 기기 변경 복원"\s*\)\s*\)'
-    )
-    menu_match = menu_pattern.search(a)
-    if not menu_match:
-        raise SystemExit("Compact cloud/account menu items not found")
-    a = a[:menu_match.start()] + menu_match.group(0)[:-1] + ', "계정 및 클라우드 데이터 삭제")' + a[menu_match.end():]
+    button_anchor = a.find("val accountBackupButton = Button(this).apply")
+    menu_start = a.find("setItems(arrayOf(", button_anchor)
+    menu_end = a.find(")) { _, which ->", menu_start)
+    if button_anchor < 0 or menu_start < 0 or menu_end < 0:
+        raise SystemExit("Compact account menu lambda not found")
+    a = a[:menu_end] + ', "계정 및 클라우드 데이터 삭제"' + a[menu_end:]
 
-    google_title = a.find('.setTitle("Google 계정으로 기록 보호")')
-    branch_start = a.rfind("} else {", 0, google_title)
+    google_title = a.find('.setTitle("Google 계정으로 기록 보호")', menu_start)
+    branch_start = a.rfind("} else {", menu_start, google_title)
     if google_title < 0 or branch_start < 0:
         raise SystemExit("Google account menu branch anchor missing")
     a = a[:branch_start] + a[branch_start:].replace("} else {", "} else if (which == 1) {", 1)
 
-    menu_end = a.find('.setNegativeButton("닫기", null)', google_title)
-    if menu_end < 0:
-        raise SystemExit("Compact account menu ending not found")
-    prefix = a[:menu_end]
-    close_pattern = re.compile(r'\n                        }\n                    }\s*$')
-    close_match = close_pattern.search(prefix[google_title:])
-    if not close_match:
-        raise SystemExit("Google account menu closing branch not found")
-    absolute_start = google_title + close_match.start()
-    absolute_end = google_title + close_match.end()
-    replacement = '''
-                        } else {
-                            confirmAccountDeletion()
-                        }
-                    }
-'''
-    a = a[:absolute_start] + replacement + a[absolute_end:]
+    menu_close = '\n                    }\n                    .setNegativeButton("닫기", null)'
+    close_at = a.find(menu_close, google_title)
+    if close_at < 0:
+        raise SystemExit("Compact account menu lambda ending not found")
+    a = a[:close_at] + '\n                        } else {\n                            confirmAccountDeletion()\n                        }' + a[close_at:]
 
 # Extend the existing Google sign-in result bridge for secure reauthentication before deletion.
 a = a.replace(
