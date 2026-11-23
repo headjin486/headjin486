@@ -255,8 +255,8 @@ jobs:
             echo "Location service must not be exported"
             exit 1
           fi
-          grep -F 'ExplorerBadge("km100000"' source/app/src/main/java/com/earthunlock/app/BadgeManager.kt
-          grep -F 'ExplorerBadge("area10000"' source/app/src/main/java/com/earthunlock/app/BadgeManager.kt
+          grep -F 'ExplorerBadge("km100000"' app/src/main/java/com/earthunlock/app/BadgeManager.kt
+          grep -F 'ExplorerBadge("area10000"' app/src/main/java/com/earthunlock/app/BadgeManager.kt
           echo "Play release configuration checks passed."
       - name: Inspect account menu Kotlin source
         working-directory: source
