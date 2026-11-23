@@ -218,6 +218,8 @@ jobs:
         run: python patches/apply_v1038_deferred_account_menu_action.py source
       - name: Apply v0.10.39 fix deferred dispatcher reference
         run: python patches/apply_v1039_fix_deferred_dispatcher.py source
+      - name: Apply v0.10.40 long-term exploration badge milestones
+        run: python patches/apply_v1040_badge_milestones.py source
       - name: Upload fully patched source for diagnostics (exclude signing material)
         uses: actions/upload-artifact@v4
         with:
@@ -241,8 +243,8 @@ jobs:
           grep -F 'applicationId = "com.earthunlock.app"' "$GRADLE"
           grep -F 'compileSdk = 36' "$GRADLE"
           grep -F 'targetSdk = 36' "$GRADLE"
-          grep -F 'versionCode = 92' "$GRADLE"
-          grep -F 'versionName = "0.10.39"' "$GRADLE"
+          grep -F 'versionCode = 93' "$GRADLE"
+          grep -F 'versionName = "0.10.40"' "$GRADLE"
           grep -F 'android:foregroundServiceType="location"' "$MANIFEST"
           grep -F 'android:usesCleartextTraffic="false"' "$MANIFEST"
           if grep -q 'ACCESS_BACKGROUND_LOCATION' "$MANIFEST"; then
@@ -253,6 +255,8 @@ jobs:
             echo "Location service must not be exported"
             exit 1
           fi
+          grep -F 'ExplorerBadge("km100000"' source/app/src/main/java/com/earthunlock/app/BadgeManager.kt
+          grep -F 'ExplorerBadge("area10000"' source/app/src/main/java/com/earthunlock/app/BadgeManager.kt
           echo "Play release configuration checks passed."
       - name: Inspect account menu Kotlin source
         working-directory: source
