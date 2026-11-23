@@ -6,11 +6,11 @@ pkg = root / "app/src/main/java/com/earthunlock/app"
 badge_file = pkg / "BadgeManager.kt"
 s = badge_file.read_text(encoding="utf-8")
 
-old_distance = '''            ExplorerBadge("km1", "산책가", "누적 1km 달성. 첫 산책의 기록을 메달로 남깁니다.", "🥾", km >= 1),
-            ExplorerBadge("km10", "탐험가", "누적 10km 달성. 익숙한 길을 넘어 탐험가의 발걸음을 이어가세요.", "🧭", km >= 10),
-            ExplorerBadge("km50", "모험가", "누적 50km 달성. 꾸준히 걸어 나만의 탐험 지도를 넓혀보세요.", "🏕️", km >= 50),
-            ExplorerBadge("km100", "지구 여행자", "누적 100km 달성. 지구 여행자라 부를 만한 거리를 기록했습니다.", "🌍", km >= 100),
-            ExplorerBadge("km500", "대탐험가", "누적 500km 달성. 긴 여정으로 대탐험가의 자격을 증명하세요.", "🚩", km >= 500),'''
+old_distance = '''            ExplorerBadge("km1", "산책가", "누적 이동 거리 1km 달성. 첫 산책의 기록을 메달로 남깁니다.", "🥾", km >= 1),
+            ExplorerBadge("km10", "탐험가", "누적 이동 거리 10km 달성. 익숙한 길을 넘어 탐험가의 발걸음을 이어가세요.", "🧭", km >= 10),
+            ExplorerBadge("km50", "모험가", "누적 이동 거리 50km 달성. 꾸준히 걸어 나만의 탐험 지도를 넓혀보세요.", "🏕️", km >= 50),
+            ExplorerBadge("km100", "지구 여행자", "누적 이동 거리 100km 달성. 지구 여행자라 부를 만한 거리를 기록했습니다.", "🌍", km >= 100),
+            ExplorerBadge("km500", "대탐험가", "누적 이동 거리 500km 달성. 긴 여정으로 대탐험가의 자격을 증명하세요.", "🚩", km >= 500),'''
 new_distance = '''            ExplorerBadge("km100", "장거리 탐험가", "누적 이동 거리 100km 달성", "🥾", km >= 100),
             ExplorerBadge("km1000", "대륙 횡단자", "누적 이동 거리 1,000km 달성", "🧭", km >= 1000),
             ExplorerBadge("km10000", "세계 일주 탐험가", "누적 이동 거리 10,000km 달성", "🏕️", km >= 10000),
