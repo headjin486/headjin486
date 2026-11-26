@@ -14,7 +14,7 @@ permissions:
   contents: read
   actions: write
 
-# MY EARTH release pipeline: source ZIP + ordered patches; release candidate v0.10.46
+# MY EARTH release pipeline: source ZIP + ordered patches; release candidate v0.10.47
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -234,6 +234,8 @@ jobs:
         run: python patches/apply_v1045_release_auth_guard.py source
       - name: Apply v0.10.46 map-first A dashboard
         run: python patches/apply_v1046_map_first_ui.py source
+      - name: Apply v0.10.47 startup crash fix
+        run: python patches/apply_v1047_startup_recovery.py source
       - name: Upload fully patched source for diagnostics (exclude signing material and local Firebase config)
         uses: actions/upload-artifact@v4
         with:
@@ -258,8 +260,8 @@ jobs:
           grep -F 'applicationId = "com.earthunlock.app"' "$GRADLE"
           grep -F 'compileSdk = 36' "$GRADLE"
           grep -F 'targetSdk = 36' "$GRADLE"
-          grep -F 'versionCode = 99' "$GRADLE"
-          grep -F 'versionName = "0.10.46"' "$GRADLE"
+          grep -F 'versionCode = 100' "$GRADLE"
+          grep -F 'versionName = "0.10.47"' "$GRADLE"
           grep -F 'android:foregroundServiceType="location"' "$MANIFEST"
           grep -F 'android:usesCleartextTraffic="false"' "$MANIFEST"
           if grep -q 'ACCESS_BACKGROUND_LOCATION' "$MANIFEST"; then
@@ -290,6 +292,16 @@ jobs:
           test -n "$APKSIGNER"
           "$APKSIGNER" verify --print-certs "$APK" | tee /tmp/apk-cert.txt
           grep -iF 'b7ab8377a9fed09f6aaff0e5fff101686753d2130f91e1c7919de2e2ac8cab8a' /tmp/apk-cert.txt
+      - name: Download previously released 0.10.46 APK for upgrade regression test
+        uses: actions/download-artifact@v4
+        with:
+          name: MY-EARTH-signed-APK
+          run-id: 45833777462
+          github-token: ${{ github.token }}
+          path: previous-1046
+      - name: Android 16 startup smoke test (upgrade and fresh install)
+        timeout-minutes: 15
+        run: bash patches/smoke_android_startup.sh
       - name: Upload installable signed APK
         uses: actions/upload-artifact@v4
         with:
