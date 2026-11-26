@@ -292,16 +292,6 @@ jobs:
           test -n "$APKSIGNER"
           "$APKSIGNER" verify --print-certs "$APK" | tee /tmp/apk-cert.txt
           grep -iF 'b7ab8377a9fed09f6aaff0e5fff101686753d2130f91e1c7919de2e2ac8cab8a' /tmp/apk-cert.txt
-      - name: Download previously released 0.10.46 APK for upgrade regression test
-        uses: actions/download-artifact@v4
-        with:
-          name: MY-EARTH-signed-APK
-          run-id: 45833777462
-          github-token: ${{ github.token }}
-          path: previous-1046
-      - name: Android 16 startup smoke test (upgrade and fresh install)
-        timeout-minutes: 15
-        run: bash patches/smoke_android_startup.sh
       - name: Upload installable signed APK
         uses: actions/upload-artifact@v4
         with:
@@ -322,5 +312,17 @@ jobs:
           path: source/app/build/outputs/bundle/release/app-release.aab
           if-no-files-found: error
           retention-days: 30
+
+      - name: Download previously released 0.10.46 APK for upgrade regression test
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: MY-EARTH-signed-APK
+          run-id: 45833777462
+          github-token: ${{ github.token }}
+          path: previous-1046
+      - name: Android 16 startup smoke test (upgrade and fresh install)
+        timeout-minutes: 15
+        run: bash patches/smoke_android_startup.sh
 
 # Rebuild after account deletion menu syntax correction
