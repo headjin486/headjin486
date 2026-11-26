@@ -2,7 +2,7 @@ name: MY EARTH Android Build
 
 on:
   push:
-    branches: [my-earth-v1048-optimization]
+    branches: [my-earth-v1049-stability]
     paths:
       - 'EarthExplorerAndroid_MVP_v0.7.4_Source.zip'
       - '.github/workflows/earth-unlock-build.yml'
@@ -14,7 +14,7 @@ permissions:
   contents: read
   actions: read
 
-# MY EARTH release pipeline: source ZIP + ordered patches; release candidate v0.10.48
+# MY EARTH release pipeline: source ZIP + ordered patches; release candidate v0.10.49
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -215,6 +215,8 @@ jobs:
         run: python patches/apply_v1047_startup_recovery.py source
       - name: Apply v0.10.48 read and rendering optimization
         run: python patches/apply_v1048_read_render_stability.py source
+      - name: Apply v0.10.49 tracking and storage stability
+        run: python patches/apply_v1049_tracking_persistence_stability.py source
       - name: Verify Play release policy and account deletion flow
         working-directory: source
         run: python scripts/verify-play-release-policy.py
@@ -228,8 +230,8 @@ jobs:
           grep -F 'applicationId = "com.earthunlock.app"' "$GRADLE"
           grep -F 'compileSdk = 36' "$GRADLE"
           grep -F 'targetSdk = 36' "$GRADLE"
-          grep -F 'versionCode = 101' "$GRADLE"
-          grep -F 'versionName = "0.10.48"' "$GRADLE"
+          grep -F 'versionCode = 102' "$GRADLE"
+          grep -F 'versionName = "0.10.49"' "$GRADLE"
           grep -F 'android:foregroundServiceType="location"' "$MANIFEST"
           grep -F 'android:usesCleartextTraffic="false"' "$MANIFEST"
           if grep -q 'ACCESS_BACKGROUND_LOCATION' "$MANIFEST"; then
@@ -249,7 +251,7 @@ jobs:
           nl -ba app/src/main/java/com/earthunlock/app/MainActivity.kt | sed -n '330,400p'
       - name: Run unit tests and build signed release APK
         working-directory: source
-        run: gradle --no-daemon :app:testDebugUnitTest :app:assembleRelease :app:bundleRelease
+        run: gradle --no-daemon :app:testDebugUnitTest :app:assembleRelease :app:bundleRelease :app:assembleReleaseAndroidTest
       - name: Verify signed release APK
         working-directory: source
         run: |
@@ -288,7 +290,7 @@ jobs:
           run-id: 45849041902
           github-token: ${{ github.token }}
           path: previous-1047
-      - name: Android 16 startup smoke test (upgrade and fresh install)
+      - name: Android 16 direct upgrade, storage and recording regression tests
         timeout-minutes: 15
         run: bash patches/smoke_android_startup.sh
 
