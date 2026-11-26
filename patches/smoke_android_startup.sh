@@ -9,16 +9,32 @@ SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:?Android SDK not available}}"
 export PATH="$SDK/emulator:$SDK/platform-tools:$PATH"
 sudo chmod a+rw /dev/kvm
 sdkmanager --install "emulator" "$API_IMAGE"
-echo no | avdmanager create avd --force -n "$AVD" -k "$API_IMAGE"
-emulator -avd "$AVD" -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect > /tmp/my-earth-emulator.log 2>&1 &
+printf 'no\n' | avdmanager create avd --force -n "$AVD" -k "$API_IMAGE" --device pixel_6
+emulator -accel-check
+emulator -list-avds
+adb start-server
+# Print startup diagnostics even when adb can't see the emulator.
+LOG=/tmp/my-earth-emulator.log
+emulator -avd "$AVD" -port 5554 -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader -memory 2048 -camera-back none -camera-front none -verbose </dev/null >"$LOG" 2>&1 &
 EMULATOR_PID=$!
-trap 'adb emu kill >/dev/null 2>&1 || true; kill "$EMULATOR_PID" >/dev/null 2>&1 || true' EXIT
-timeout 240 adb wait-for-device
-for n in $(seq 1 100); do
-  if [[ "$(adb shell getprop sys.boot_completed | tr -d '\r')" == "1" ]]; then break; fi
+cleanup() {
+  result=$?
+  if [[ "$result" -ne 0 ]]; then
+    echo "Emulator / startup gate failed (exit $result)"
+    tail -100 "$LOG" || true
+    adb devices -l || true
+    df -h || true
+  fi
+  adb emu kill >/dev/null 2>&1 || true
+  kill "$EMULATOR_PID" >/dev/null 2>&1 || true
+}
+trap cleanup EXIT
+for n in $(seq 1 90); do
+  kill -0 "$EMULATOR_PID" 2>/dev/null || { echo "Emulator exited during boot"; exit 1; }
+  if [[ "$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r' || true)" == "1" ]]; then break; fi
   sleep 3
 done
-[[ "$(adb shell getprop sys.boot_completed | tr -d '\r')" == "1" ]] || { tail -80 /tmp/my-earth-emulator.log; exit 1; }
+[[ "$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r' || true)" == "1" ]] || { echo "Emulator did not boot"; exit 1; }
 adb shell input keyevent 82
 adb shell settings put global window_animation_scale 0
 adb shell settings put global transition_animation_scale 0
@@ -42,11 +58,16 @@ launch_check() {
 }
 
 # Reproduce the released 0.10.46 failure when possible, then test an in-place update.
-adb install previous-1046/app-release.apk
-if launch_check old-1046; then
-  echo "Previous failure not reproduced on API 36; regression gate still tests both install paths."
+if [[ -f previous-1046/app-release.apk ]]; then
+  adb install previous-1046/app-release.apk
+  if launch_check old-1046; then
+    echo "Previous failure not reproduced on API 36; regression gate still tests both install paths."
+  else
+    echo "Previous release startup failure reproduced on emulator."
+  fi
 else
-  echo "Previous release startup failure reproduced on emulator."
+  adb install source/app/build/outputs/apk/release/app-release.apk
+  launch_check initial-1047
 fi
 adb install -r source/app/build/outputs/apk/release/app-release.apk
 launch_check upgrade-1047
