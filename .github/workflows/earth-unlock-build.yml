@@ -2,7 +2,7 @@ name: MY EARTH Android Build
 
 on:
   push:
-    branches: [my-earth-v1050-smooth-boundaries]
+    branches: [my-earth-v1051-r8-quality]
     paths:
       - 'EarthExplorerAndroid_MVP_v0.7.4_Source.zip'
       - '.github/workflows/earth-unlock-build.yml'
@@ -14,7 +14,7 @@ permissions:
   contents: read
   actions: read
 
-# MY EARTH release pipeline: source ZIP + ordered patches; release candidate v0.10.50
+# MY EARTH release pipeline: source ZIP + ordered patches; release candidate v0.10.51
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -219,6 +219,18 @@ jobs:
         run: python patches/apply_v1049_tracking_persistence_stability.py source
       - name: Apply v0.10.50 smooth fog contours
         run: python patches/apply_v1050_smooth_fog_contours.py source
+      - name: Build unminified fixture for seeding existing 0.10.50
+        run: |
+          set -euo pipefail
+          TEST=source/app/src/androidTest/java/com/earthunlock/app/TrackingStorageInstrumentedTest.kt
+          cp "$TEST" /tmp/my-earth-original-storage-test.kt
+          sed -i 's/assertEquals("0.10.49"/assertEquals("0.10.50"/' "$TEST"
+          (cd source && gradle --no-daemon :app:assembleReleaseAndroidTest)
+          mkdir -p previous-1050
+          cp "$(find source/app/build/outputs/apk/androidTest -name '*.apk' -type f | head -1)" previous-1050/seed-test.apk
+          mv /tmp/my-earth-original-storage-test.kt "$TEST"
+      - name: Apply v0.10.51 R8 release optimization
+        run: python patches/apply_v1051_release_r8.py source
       - name: Verify Play release policy and account deletion flow
         working-directory: source
         run: python scripts/verify-play-release-policy.py
@@ -232,8 +244,8 @@ jobs:
           grep -F 'applicationId = "com.earthunlock.app"' "$GRADLE"
           grep -F 'compileSdk = 36' "$GRADLE"
           grep -F 'targetSdk = 36' "$GRADLE"
-          grep -F 'versionCode = 103' "$GRADLE"
-          grep -F 'versionName = "0.10.50"' "$GRADLE"
+          grep -F 'versionCode = 104' "$GRADLE"
+          grep -F 'versionName = "0.10.51"' "$GRADLE"
           grep -F 'android:foregroundServiceType="location"' "$MANIFEST"
           grep -F 'android:usesCleartextTraffic="false"' "$MANIFEST"
           if grep -q 'ACCESS_BACKGROUND_LOCATION' "$MANIFEST"; then
@@ -251,7 +263,7 @@ jobs:
         working-directory: source
         run: |
           nl -ba app/src/main/java/com/earthunlock/app/MainActivity.kt | sed -n '330,400p'
-      - name: Run unit tests and build signed release APK
+      - name: Run unit tests and build signed optimized release APK
         working-directory: source
         run: gradle --no-daemon :app:testDebugUnitTest :app:assembleRelease :app:bundleRelease :app:assembleReleaseAndroidTest
       - name: Verify signed release APK
@@ -271,12 +283,28 @@ jobs:
           path: source/app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
           retention-days: 30
-      - name: Verify Play Store Android App Bundle
+      - name: Verify Play Store Android App Bundle and actual R8 output
         working-directory: source
         run: |
+          set -euo pipefail
           AAB=app/build/outputs/bundle/release/app-release.aab
           test -s "$AAB"
           ls -lh "$AAB"
+          test -s app/build/outputs/mapping/release/mapping.txt
+          python - <<'PY'
+          import json, zipfile
+          with zipfile.ZipFile("app/build/outputs/bundle/release/app-release.aab") as z:
+              dex = sum(e.file_size for e in z.infolist() if e.filename.startswith("base/dex/") and e.filename.endswith(".dex"))
+              baseline = 15822760
+              print(f"DEX_BASELINE_BYTES={baseline}")
+              print(f"DEX_RELEASE_BYTES={dex}")
+              print(f"DEX_SIZE_REDUCTION_PERCENT={(1-dex/baseline)*100:.2f}")
+              assert dex < baseline, "Optimized DEX must be smaller than v0.10.50"
+              meta = "BUNDLE-METADATA/com.android.tools/r8.json"
+              assert meta in z.namelist(), "R8 metadata missing: do not deliver"
+              print("R8_METADATA=" + json.dumps(json.loads(z.read(meta)), separators=(",", ":")))
+              assert any("mapping.txt" in e.filename or "proguard.map" in e.filename for e in z.infolist()), "Deobfuscation mapping missing"
+          PY
       - name: Upload Play Store Android App Bundle
         uses: actions/upload-artifact@v4
         with:
@@ -285,14 +313,14 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      - name: Download stable 0.10.49 APK for upgrade regression test
+      - name: Download stable 0.10.50 APK for upgrade regression test
         uses: actions/download-artifact@v4
         with:
           name: MY-EARTH-signed-APK
-          run-id: 45914009193
+          run-id: 45923761434
           github-token: ${{ github.token }}
-          path: previous-1049
-      - name: Android 16 direct upgrade, storage, fog rendering and recording regression tests
+          path: previous-1050
+      - name: Android 16 R8 direct upgrade, storage, map, Firebase and recording regression tests
         timeout-minutes: 15
         run: bash patches/smoke_android_startup.sh
 

@@ -114,9 +114,9 @@ run_storage_test() {
   grep -F 'OK (1 test)' "/tmp/my-earth-$method.txt"
   echo "PASS: storage instrumentation $method"
 }
-test -s previous-1049/app-release.apk
-adb install previous-1049/app-release.apk
-launch_check old-1049
+test -s previous-1050/app-release.apk
+adb install previous-1050/app-release.apk
+launch_check old-1050
 ui_find text English tap
 sleep 3
 ui_find class android.widget.EditText tap
@@ -126,16 +126,29 @@ sleep 3
 ui_find text SmokeTest check
 TEST_APK=$(find source/app/build/outputs/apk/androidTest -name '*.apk' -type f | head -1)
 test -s "$TEST_APK"
-adb install "$TEST_APK"
+# Old APK must be seeded by a fixture compiled against its unminified class names.
+test -s previous-1050/seed-test.apk
+adb install previous-1050/seed-test.apk
 run_storage_test seedBeforeUpgrade
+adb uninstall com.earthunlock.app.test
 adb install -r source/app/build/outputs/apk/release/app-release.apk
+adb install "$TEST_APK"
 run_storage_test verifyAfterUpgrade
+adb shell am instrument -w -r -e class com.earthunlock.app.ReleaseSdkInstrumentedTest \
+  com.earthunlock.app.test/androidx.test.runner.AndroidJUnitRunner | tee /tmp/my-earth-release-sdk.txt
+grep -F 'OK (1 test)' /tmp/my-earth-release-sdk.txt
+echo 'PASS: R8 release Firebase setup, OAuth resource and Google Sign-In intent' 
 adb shell am instrument -w -r -e class com.earthunlock.app.FogRenderingInstrumentedTest \
   com.earthunlock.app.test/androidx.test.runner.AndroidJUnitRunner | tee /tmp/my-earth-fog-rendering.txt
 grep -F 'OK (1 test)' /tmp/my-earth-fog-rendering.txt
 echo 'PASS: Android fog contour, hole, zoom and rotation rendering checks'
-launch_check upgrade-1050
+launch_check upgrade-1051
 ui_find text SmokeTest check
+ui_find text "백업 · 계정" tap
+ui_find text "Google 계정 연결 / 기기 변경 복원" check
+ui_find text "계정 및 클라우드 데이터 삭제" check
+adb shell input keyevent 4
+sleep 2
 # Newly async badge loading must still display the collection.
 ui_find content-desc "나의 배지 컬렉션" tap
 ui_find text "나의 배지 컬렉션" check
@@ -148,14 +161,14 @@ for n in $(seq 1 6); do
   adb shell input swipe "$((width*3/4))" "$((height/3))" "$((width/4))" "$((height*2/5))" 120
 done
 sleep 4
-check_running map-and-badges-1050
+check_running map-and-badges-1051
 # Exercise background/resume without force stop, then a separate relaunch.
 adb shell input keyevent 3
 sleep 2
 adb shell am start -W -n "$ACT"
 sleep 4
 ui_find text SmokeTest check
-check_running resume-1050
+check_running resume-1051
 adb shell pm grant "$PKG" android.permission.ACCESS_COARSE_LOCATION
 adb shell pm grant "$PKG" android.permission.ACCESS_FINE_LOCATION
 ui_find text "Start recording" tap
@@ -165,13 +178,13 @@ adb emu geo fix 128.34 36.12
 sleep 5
 adb emu geo fix 128.3401 36.1201
 sleep 5
-check_running recording-1050
+check_running recording-1051
 ui_find text "Stop recording" tap
 ui_find text "Start recording" check
-check_running recording-stopped-1050
-launch_check relaunch-1050
+check_running recording-stopped-1051
+launch_check relaunch-1051
 ui_find text SmokeTest check
 adb uninstall "$PKG"
 adb install source/app/build/outputs/apk/release/app-release.apk
-launch_check fresh-1050
-echo "All 0.10.50 startup, direct upgrade, storage preservation, rollback, badge, map gesture, resume and recording lifecycle checks passed."
+launch_check fresh-1051
+echo "All 0.10.51 startup, direct upgrade, storage preservation, rollback, badge, map gesture, resume and recording lifecycle checks passed."
