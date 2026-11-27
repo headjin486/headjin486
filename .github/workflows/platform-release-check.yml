@@ -1,0 +1,68 @@
+name: MY EARTH isolated signed release validation
+on:
+  push:
+    branches: [my-earth-v1051-platform-validation]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+      - name: Download exact signed baseline 0.10.50
+        uses: actions/download-artifact@v4
+        with:
+          name: MY-EARTH-signed-APK
+          run-id: 45923761434
+          github-token: ${{ github.token }}
+          path: previous-1050
+      - name: Download exact signed R8 release candidate 0.10.51
+        uses: actions/download-artifact@v4
+        with:
+          name: MY-EARTH-signed-APK
+          run-id: 45932489845
+          github-token: ${{ github.token }}
+          path: candidate-1051
+      - name: Compile isolated Android platform-only regression harness
+        env:
+          ANDROID_SIGNING_BUNDLE: ${{ secrets.ANDROID_SIGNING_BUNDLE }}
+        run: |
+          set -euo pipefail
+          sdkmanager "platforms;android-36" "build-tools;36.0.0"
+          export BT="$ANDROID_HOME/build-tools/36.0.0"
+          export AJ="$ANDROID_HOME/platforms/android-36/android.jar"
+          mkdir -p harness-classes harness-dex
+          javac --release 8 -cp "$AJ" -d harness-classes patches/platform-harness/ReleaseHarness.java
+          "$BT/d8" --lib "$AJ" --min-api 26 --output harness-dex $(find harness-classes -name '*.class')
+          "$BT/aapt2" link -I "$AJ" --manifest patches/platform-harness/AndroidManifest.xml -o unsigned-harness.apk
+          (cd harness-dex && zip -q ../unsigned-harness.apk classes.dex)
+          "$BT/zipalign" -f 4 unsigned-harness.apk aligned-harness.apk
+          python3 - <<'PY'
+          import os,base64,subprocess,tempfile
+          from pathlib import Path
+          values=dict(line.split('=',1) for line in os.environ['ANDROID_SIGNING_BUNDLE'].splitlines() if '=' in line)
+          values={k.strip():v.strip() for k,v in values.items()}
+          with tempfile.TemporaryDirectory() as tmp:
+              key=Path(tmp)/'upload-key.jks'
+              key.write_bytes(base64.b64decode(values['keystoreBase64'],validate=True))
+              key.chmod(0o600)
+              env=dict(os.environ, HARNESS_STORE_PW=values['storePassword'], HARNESS_KEY_PW=values['keyPassword'])
+              subprocess.run([os.environ['BT']+'/apksigner','sign','--ks',str(key),'--ks-key-alias',values['keyAlias'],'--ks-pass','env:HARNESS_STORE_PW','--key-pass','env:HARNESS_KEY_PW','--out','platform-test.apk','aligned-harness.apk'],env=env,check=True)
+          PY
+          "$BT/apksigner" verify platform-test.apk
+          "$BT/apksigner" verify candidate-1051/app-release.apk
+          "$BT/apksigner" verify previous-1050/app-release.apk
+          echo 'Isolated platform harness compiled and signed'
+      - name: Exact signed APK in-place upgrade and real Android 16 regression
+        timeout-minutes: 15
+        run: bash patches/platform-harness/smoke.sh
+
