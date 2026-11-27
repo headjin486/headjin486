@@ -31,6 +31,8 @@ cleanup() {
   result=$?
   if [[ "$result" -ne 0 ]]; then
     echo "Emulator / startup gate failed (exit $result)"
+    adb logcat -b crash -d || true
+    adb logcat -d -s AndroidRuntime:E TestRunner:V ActivityManager:W | tail -260 || true
     tail -100 "$LOG" || true
     adb devices -l || true
     df -h || true
@@ -132,7 +134,10 @@ adb install previous-1050/seed-test.apk
 run_storage_test seedBeforeUpgrade
 adb uninstall com.earthunlock.app.test
 adb install -r source/app/build/outputs/apk/release/app-release.apk
+launch_check upgrade-before-instrumentation-1051
+ui_find text SmokeTest check
 adb install "$TEST_APK"
+adb logcat -b crash -c
 run_storage_test verifyAfterUpgrade
 adb shell am instrument -w -r -e class com.earthunlock.app.ReleaseSdkInstrumentedTest \
   com.earthunlock.app.test/androidx.test.runner.AndroidJUnitRunner | tee /tmp/my-earth-release-sdk.txt
