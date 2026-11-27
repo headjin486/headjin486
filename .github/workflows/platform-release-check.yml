@@ -66,3 +66,4 @@ jobs:
         timeout-minutes: 15
         run: bash patches/platform-harness/smoke.sh
 
+# Verify the already-built signed APKs without rebuilding or publishing.
