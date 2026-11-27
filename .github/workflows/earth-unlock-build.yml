@@ -2,7 +2,7 @@ name: MY EARTH Android Build
 
 on:
   push:
-    branches: [my-earth-v1049-stability]
+    branches: [my-earth-v1050-smooth-boundaries]
     paths:
       - 'EarthExplorerAndroid_MVP_v0.7.4_Source.zip'
       - '.github/workflows/earth-unlock-build.yml'
@@ -14,7 +14,7 @@ permissions:
   contents: read
   actions: read
 
-# MY EARTH release pipeline: source ZIP + ordered patches; release candidate v0.10.49
+# MY EARTH release pipeline: source ZIP + ordered patches; release candidate v0.10.50
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -217,6 +217,8 @@ jobs:
         run: python patches/apply_v1048_read_render_stability.py source
       - name: Apply v0.10.49 tracking and storage stability
         run: python patches/apply_v1049_tracking_persistence_stability.py source
+      - name: Apply v0.10.50 smooth fog contours
+        run: python patches/apply_v1050_smooth_fog_contours.py source
       - name: Verify Play release policy and account deletion flow
         working-directory: source
         run: python scripts/verify-play-release-policy.py
@@ -230,8 +232,8 @@ jobs:
           grep -F 'applicationId = "com.earthunlock.app"' "$GRADLE"
           grep -F 'compileSdk = 36' "$GRADLE"
           grep -F 'targetSdk = 36' "$GRADLE"
-          grep -F 'versionCode = 102' "$GRADLE"
-          grep -F 'versionName = "0.10.49"' "$GRADLE"
+          grep -F 'versionCode = 103' "$GRADLE"
+          grep -F 'versionName = "0.10.50"' "$GRADLE"
           grep -F 'android:foregroundServiceType="location"' "$MANIFEST"
           grep -F 'android:usesCleartextTraffic="false"' "$MANIFEST"
           if grep -q 'ACCESS_BACKGROUND_LOCATION' "$MANIFEST"; then
@@ -283,14 +285,14 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      - name: Download stable 0.10.47 APK for upgrade regression test
+      - name: Download stable 0.10.49 APK for upgrade regression test
         uses: actions/download-artifact@v4
         with:
           name: MY-EARTH-signed-APK
-          run-id: 45849041902
+          run-id: 45914009193
           github-token: ${{ github.token }}
-          path: previous-1047
-      - name: Android 16 direct upgrade, storage and recording regression tests
+          path: previous-1049
+      - name: Android 16 direct upgrade, storage, fog rendering and recording regression tests
         timeout-minutes: 15
         run: bash patches/smoke_android_startup.sh
 

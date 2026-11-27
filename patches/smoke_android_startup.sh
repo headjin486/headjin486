@@ -114,9 +114,9 @@ run_storage_test() {
   grep -F 'OK (1 test)' "/tmp/my-earth-$method.txt"
   echo "PASS: storage instrumentation $method"
 }
-test -s previous-1047/app-release.apk
-adb install previous-1047/app-release.apk
-launch_check old-1047
+test -s previous-1049/app-release.apk
+adb install previous-1049/app-release.apk
+launch_check old-1049
 ui_find text English tap
 sleep 3
 ui_find class android.widget.EditText tap
@@ -130,7 +130,11 @@ adb install "$TEST_APK"
 run_storage_test seedBeforeUpgrade
 adb install -r source/app/build/outputs/apk/release/app-release.apk
 run_storage_test verifyAfterUpgrade
-launch_check upgrade-1049
+adb shell am instrument -w -r -e class com.earthunlock.app.FogRenderingInstrumentedTest \
+  com.earthunlock.app.test/androidx.test.runner.AndroidJUnitRunner | tee /tmp/my-earth-fog-rendering.txt
+grep -F 'OK (1 test)' /tmp/my-earth-fog-rendering.txt
+echo 'PASS: Android fog contour, hole, zoom and rotation rendering checks'
+launch_check upgrade-1050
 ui_find text SmokeTest check
 # Newly async badge loading must still display the collection.
 ui_find content-desc "나의 배지 컬렉션" tap
@@ -144,14 +148,14 @@ for n in $(seq 1 6); do
   adb shell input swipe "$((width*3/4))" "$((height/3))" "$((width/4))" "$((height*2/5))" 120
 done
 sleep 4
-check_running map-and-badges-1049
+check_running map-and-badges-1050
 # Exercise background/resume without force stop, then a separate relaunch.
 adb shell input keyevent 3
 sleep 2
 adb shell am start -W -n "$ACT"
 sleep 4
 ui_find text SmokeTest check
-check_running resume-1049
+check_running resume-1050
 adb shell pm grant "$PKG" android.permission.ACCESS_COARSE_LOCATION
 adb shell pm grant "$PKG" android.permission.ACCESS_FINE_LOCATION
 ui_find text "Start recording" tap
@@ -161,13 +165,13 @@ adb emu geo fix 128.34 36.12
 sleep 5
 adb emu geo fix 128.3401 36.1201
 sleep 5
-check_running recording-1049
+check_running recording-1050
 ui_find text "Stop recording" tap
 ui_find text "Start recording" check
-check_running recording-stopped-1049
-launch_check relaunch-1049
+check_running recording-stopped-1050
+launch_check relaunch-1050
 ui_find text SmokeTest check
 adb uninstall "$PKG"
 adb install source/app/build/outputs/apk/release/app-release.apk
-launch_check fresh-1049
-echo "All 0.10.49 startup, direct upgrade, storage preservation, rollback, badge, map gesture, resume and recording lifecycle checks passed."
+launch_check fresh-1050
+echo "All 0.10.50 startup, direct upgrade, storage preservation, rollback, badge, map gesture, resume and recording lifecycle checks passed."
